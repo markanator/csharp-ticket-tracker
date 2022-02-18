@@ -46,7 +46,7 @@ namespace TheBugTracker.Services
                     }
                 }
                 // add new PM
-                await AddProjectManagerAsync(userId, projectId);
+                await AddUserToProjectAsync(userId, projectId);
                 return true;
             }
             catch (Exception ex1)
