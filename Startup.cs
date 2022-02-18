@@ -43,6 +43,7 @@ namespace TheBugTracker
             services.AddScoped<ITicketHistoryService, TicketHistoryService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IInviteService, InviteService>();
+            services.AddScoped<IFileService, FileService>();
 
             services.AddScoped<IEmailSender, EmailService>();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
