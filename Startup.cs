@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TheBugTracker.Data;
 using TheBugTracker.Models;
 using TheBugTracker.Services;
@@ -47,6 +41,8 @@ namespace TheBugTracker
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<ITicketHistoryService, TicketHistoryService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IInviteService, InviteService>();
 
             services.AddScoped<IEmailSender, EmailService>();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
