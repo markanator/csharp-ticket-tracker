@@ -43,6 +43,7 @@ namespace TheBugTracker
             // add custom 
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ICompanyInfoService, CompanyInfoService>();
+            services.AddScoped<IProjectService, ProjectService>();
 
             services.AddControllersWithViews();
         }
