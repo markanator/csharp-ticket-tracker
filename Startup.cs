@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,9 @@ namespace TheBugTracker
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<ITicketHistoryService, TicketHistoryService>();
+
+            services.AddScoped<IEmailSender, EmailService>();
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 
             services.AddControllersWithViews();
         }
