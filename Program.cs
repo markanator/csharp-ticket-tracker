@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using TheBugTracker.Data;
 
 namespace TheBugTracker
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            // seed DB
+            await DataUtils.ManageDataAsync(host);
+            // run MVC App
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
