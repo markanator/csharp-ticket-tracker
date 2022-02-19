@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using TheBugTracker.Data;
 using TheBugTracker.Models;
 using TheBugTracker.Services;
+using TheBugTracker.Services.Factories;
 using TheBugTracker.Services.Interfaces;
 
 namespace TheBugTracker
@@ -36,10 +37,11 @@ namespace TheBugTracker
             // Adding Custom Auth + Roles
             services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddClaimsPrincipalFactory<BTUserClaimsPrincipleFactory>()
                     .AddDefaultUI()
                     .AddDefaultTokenProviders();
 
-            // add custom 
+            // add custom services
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ICompanyInfoService, CompanyInfoService>();
             services.AddScoped<IProjectService, ProjectService>();
