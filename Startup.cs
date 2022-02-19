@@ -27,9 +27,9 @@ namespace TheBugTracker
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                                                         options.UseNpgsql(
-                                                                DataUtils.GetConnectionString(Configuration)
-                                                            )
-                                                        );
+                                                                DataUtils.GetConnectionString(Configuration),
+                                                                // enable splitting of queries to improve perf, & prevent redundant data fetching
+                                                                o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
