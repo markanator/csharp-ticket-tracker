@@ -37,7 +37,7 @@ namespace TheBugTracker
             // Adding Custom Auth + Roles
             services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<ApplicationDbContext>()
-                    .AddClaimsPrincipalFactory<BTUserClaimsPrincipleFactory>()
+                    .AddClaimsPrincipalFactory<BTUserClaimsPrincipleFactory>() // used to attach companyId to identity
                     .AddDefaultUI()
                     .AddDefaultTokenProviders();
 
@@ -50,6 +50,7 @@ namespace TheBugTracker
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IInviteService, InviteService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ILookupService, LookupService>();
 
             services.AddScoped<IEmailSender, EmailService>();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));

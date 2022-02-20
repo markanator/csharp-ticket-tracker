@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using TheBugTracker.Services.Interfaces;
+using System.Linq;
+using System.Threading.Tasks;
+using TheBugTracker.Data;
 using TheBugTracker.Models;
 using TheBugTracker.Models.Enums;
-using TheBugTracker.Data;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using TheBugTracker.Services.Interfaces;
 
 namespace TheBugTracker.Services
 {
@@ -156,12 +156,18 @@ namespace TheBugTracker.Services
         // READ BY ID
         public async Task<Project> GetProjectByIdAsync(int projectId, int companyId)
         {
-            var project = await _context.Projects.Include(p => p.Tickets)
-                                                 .Include(p => p.Members)
-                                                 .Include(p => p.ProjectPriority)
-                                                 .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
+            try
+            {
+                return await _context.Projects.Include(p => p.Tickets)
+                                                     .Include(p => p.Members)
+                                                     .Include(p => p.ProjectPriority)
+                                                     .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
+            }
+            catch (Exception)
+            {
 
-            return project;
+                throw;
+            }
         }
 
         public async Task<BTUser> GetProjectManagerAsync(int projectId)
@@ -261,7 +267,7 @@ namespace TheBugTracker.Services
         public async Task<bool> IsUserOnProjectAsync(string userId, int projectId)
         {
             Project project = await _context.Projects.Include(p => p.Members).FirstOrDefaultAsync(p => p.Id == projectId);
-            
+
             if (project != null)
             {
                 return project.Members.Any(m => m.Id == userId);
@@ -313,7 +319,7 @@ namespace TheBugTracker.Services
                         await _context.SaveChangesAsync();
                         return;
                     }
-                } 
+                }
                 catch (Exception)
                 {
                     throw;
