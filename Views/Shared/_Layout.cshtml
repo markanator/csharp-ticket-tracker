@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using TheBugTracker.Models.Enums
 @inject SignInManager<BTUser> SignInManager
 
 <!DOCTYPE html>
@@ -38,7 +39,10 @@
                                     <i class="fs-5 bi-file-earmark-ppt"></i><span class="ms-1 d-none d-sm-inline">Projects</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
+                                    @if (!User.IsInRole(nameof(Roles.Admin)))
+                                   {
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="Create">New project...</a></li>
+                                   }
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="Index">Index</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="MyProjects">My Projects</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="AllProjects">All Projects</a></li>

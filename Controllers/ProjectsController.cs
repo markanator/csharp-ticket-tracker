@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TheBugTracker.Data;
 using TheBugTracker.Extensions;
+using TheBugTracker.Models;
 using TheBugTracker.Models.Enums;
 using TheBugTracker.Services.Interfaces;
 using TheBugTracker.ViewModels;
@@ -21,20 +24,31 @@ namespace TheBugTracker.Controllers
         private readonly ILookupService _lookupService;
         private readonly IFileService _fileService;
         private readonly IProjectService _projectService;
+        private readonly UserManager<BTUser> _userManagerService;
 
-        public ProjectsController(ApplicationDbContext context, IRoleService roles, ILookupService lookup, IFileService file, IProjectService project)
+        public ProjectsController(ApplicationDbContext context, IRoleService roles, ILookupService lookup, IFileService file, IProjectService project, UserManager<BTUser> userManager)
         {
             _context = context;
             _rolesService = roles;
             _lookupService = lookup;
             _fileService = file;
             _projectService = project;
+            _userManagerService = userManager;
         }
 
         // GET: Projects
         public async Task<IActionResult> Index()
         {
             var projects = await _projectService.GetAllProjectsByCompany(User.Identity.GetCompanyId().Value);
+            return View(projects);
+        }
+
+        // GET: Projects
+        public async Task<IActionResult> MyProjects()
+        {
+            string userId = _userManagerService.GetUserId(User);
+            List<Project> projects = await _projectService.GetUserProjectsAsync(userId);
+
             return View(projects);
         }
 
