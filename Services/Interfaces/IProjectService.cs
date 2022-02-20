@@ -27,5 +27,6 @@ namespace TheBugTracker.Services.Interfaces
         Task RemoveUsersFromProjectByRoleAsync(string role, int projectId);
         Task RemoveUserFromProjectAsync(string userId, int projectId);
         Task UpdateProjectAsync(Project project);
+        Task RestoreProjectAsync(Project project);
     }
 }

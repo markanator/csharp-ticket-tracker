@@ -24,8 +24,16 @@ namespace TheBugTracker.Services
         // CREATE
         public async Task AddNewProjectAsync(Project project)
         {
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Projects.Add(project);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<bool> AddProjectManagerAsync(string userId, int projectId)
@@ -92,9 +100,24 @@ namespace TheBugTracker.Services
         // DELETE
         public async Task ArchiveProjectAsync(Project project)
         {
-            project.Archived = true;
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
+            try
+            {
+                project.Archived = true;
+                await this.UpdateProjectAsync(project);
+
+                // archive tickets as well
+                foreach (var ticket in project.Tickets)
+                {
+                    ticket.ArchivedByProject = true;
+                    _context.Update(ticket);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<List<BTUser>> GetAllProjectMembersExceptPMAsync(int projectId)
@@ -109,7 +132,8 @@ namespace TheBugTracker.Services
         public async Task<List<Project>> GetAllProjectsByCompany(int companyId)
         {
             List<Project> projects = new();
-            projects = await _context.Projects.Where(p => p.CompanyId == companyId && p.Archived == false)
+            // TODO: don't allow archived
+            projects = await _context.Projects.Where(p => p.CompanyId == companyId)
                                             .Include(p => p.Members)
                                             .Include(p => p.Tickets)
                                                 .ThenInclude(t => t.TicketStatus)
@@ -257,29 +281,52 @@ namespace TheBugTracker.Services
 
         public async Task<List<BTUser>> GetUsersNotOnProjectAsync(int projectId, int companyId)
         {
-            // for each record, only if they are NOT attached to project
-            var users = await _context.Users.Where(u => u.Projects.All(p => p.Id != projectId)).ToListAsync();
-            // only for specific company
-            return users.Where(u => u.CompanyId == companyId).ToList();
+            try
+            {
+                // for each record, only if they are NOT attached to project
+                var users = await _context.Users.Where(u => u.Projects.All(p => p.Id != projectId)).ToListAsync();
+                // only for specific company
+                return users.Where(u => u.CompanyId == companyId).ToList();
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
         }
 
         public async Task<bool> IsUserOnProjectAsync(string userId, int projectId)
         {
-            Project project = await _context.Projects.Include(p => p.Members).FirstOrDefaultAsync(p => p.Id == projectId);
-
-            if (project != null)
+            try
             {
-                return project.Members.Any(m => m.Id == userId);
-            }
+                Project project = await _context.Projects.Include(p => p.Members).FirstOrDefaultAsync(p => p.Id == projectId);
 
+                if (project != null)
+                {
+                    return project.Members.Any(m => m.Id == userId);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             return false;
         }
 
         public async Task<int> LookupProjectPriorityId(string priorityName)
         {
-            // await thread call, and only return Id of item
-            return (await _context.ProjectPriorities.FirstOrDefaultAsync(p => p.Name == priorityName)).Id;
+            try
+            {
+                // await thread call, and only return Id of item
+                return (await _context.ProjectPriorities.FirstOrDefaultAsync(p => p.Name == priorityName)).Id;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task RemoveProjectManagerAsync(int projectId)
@@ -358,11 +405,41 @@ namespace TheBugTracker.Services
             }
         }
 
+        public async Task RestoreProjectAsync(Project project)
+        {
+            try
+            {
+                project.Archived = false;
+                await this.UpdateProjectAsync(project);
+
+                // Restore tickets as well
+                foreach (var ticket in project.Tickets)
+                {
+                    ticket.ArchivedByProject = false;
+                    _context.Update(ticket);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         // UPDATE
         public async Task UpdateProjectAsync(Project project)
         {
-            _context.Update(project);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Update(project);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

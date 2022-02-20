@@ -29,7 +29,11 @@ namespace TheBugTracker.Models
         [DisplayName("Archived")]
         public bool Archived { get; set; }
 
-        [DisplayName("Project")] 
+        // add ability to archive a project's tickets and restore them
+        [DisplayName("Archived By Project")]
+        public bool ArchivedByProject { get; set; }
+
+        [DisplayName("Project")]
         public int ProjectId { get; set; } // FK
 
         [DisplayName("Ticket Type")]
