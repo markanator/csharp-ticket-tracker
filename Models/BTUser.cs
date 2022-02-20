@@ -16,7 +16,7 @@ namespace TheBugTracker.Models
         [Display(Name = "First Name")]
         public string LastName { get; set; }
 
-        [NotMapped] 
+        [NotMapped]
         [Display(Name = "Full Name")]
         public string FullName { get => $"{this.FirstName} {this.LastName}"; }
 
@@ -29,7 +29,7 @@ namespace TheBugTracker.Models
         [Display(Name = "File Extension")]
         public string AvatarContentType { get; set; }
 
-        public int? CompanyId { get; set; } // FK
+        public int CompanyId { get; set; } // FK
 
         // Navigation Projects
         public virtual Company Company { get; set; }
