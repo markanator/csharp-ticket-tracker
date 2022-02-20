@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TheBugTracker.Data;
 using TheBugTracker.Models;
 using TheBugTracker.Services.Interfaces;
-using System.Linq;
 
 namespace TheBugTracker.Services
 {
@@ -35,6 +37,20 @@ namespace TheBugTracker.Services
             return await _roleManager.GetRoleNameAsync(role);
         }
 
+        public async Task<List<IdentityRole>> GetRolesAsync()
+        {
+            try
+            {
+                // fetch and return the list of current Roles from db
+                return await _context.Roles.ToListAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<string>> GetUserRolesAsync(BTUser user)
         {
             // fetch all roles for a given user
@@ -56,9 +72,9 @@ namespace TheBugTracker.Services
             // fetch list of users, of given role
             List<string> userIds = (await _userManger.GetUsersInRoleAsync(roleName)).Select(u => u.Id).ToList();
             // If list above does not contain this userId, keep it
-            List<BTUser> roleUsers = _context.Users.Where(u => !userIds.Contains(u.Id)).ToList(); 
+            List<BTUser> roleUsers = _context.Users.Where(u => !userIds.Contains(u.Id)).ToList();
             // Multitenancy check
-            List<BTUser> results = _context.Users.Where(u => u.CompanyId == companyId).ToList(); 
+            List<BTUser> results = _context.Users.Where(u => u.CompanyId == companyId).ToList();
 
             return results;
         }

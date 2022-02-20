@@ -227,9 +227,9 @@ namespace TheBugTracker.Data
             //Seed Default Admin User
             var defaultUser = new BTUser
             {
-                UserName = "btadmin1@bugtracker.com",
-                Email = "btadmin1@bugtracker.com",
-                FirstName = "Bill",
+                UserName = "admin1@bugtracker.com",
+                Email = "admin1@bugtracker.com",
+                FirstName = "Joshua",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -239,7 +239,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Admin.ToString());
                 }
             }
@@ -255,9 +255,9 @@ namespace TheBugTracker.Data
             //Seed Default Admin User
             defaultUser = new BTUser
             {
-                UserName = "btadmin2@bugtracker.com",
-                Email = "btadmin2@bugtracker.com",
-                FirstName = "Steve",
+                UserName = "admin2@bugtracker.com",
+                Email = "admin2@bugtracker.com",
+                FirstName = "Jesus",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -267,7 +267,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Admin.ToString());
                 }
             }
@@ -284,9 +284,9 @@ namespace TheBugTracker.Data
             //Seed Default ProjectManager1 User
             defaultUser = new BTUser
             {
-                UserName = "ProjectManager1@bugtracker.com",
-                Email = "ProjectManager1@bugtracker.com",
-                FirstName = "John",
+                UserName = "projectmanager1@bugtracker.com",
+                Email = "projectmanager1@bugtracker.com",
+                FirstName = "Laura",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -296,7 +296,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.ProjectManager.ToString());
                 }
             }
@@ -313,9 +313,9 @@ namespace TheBugTracker.Data
             //Seed Default ProjectManager2 User
             defaultUser = new BTUser
             {
-                UserName = "ProjectManager2@bugtracker.com",
-                Email = "ProjectManager2@bugtracker.com",
-                FirstName = "Jane",
+                UserName = "projectmanager2@bugtracker.com",
+                Email = "projectmanager2@bugtracker.com",
+                FirstName = "Yvonne",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -325,7 +325,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.ProjectManager.ToString());
                 }
             }
@@ -342,9 +342,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer1 User
             defaultUser = new BTUser
             {
-                UserName = "Developer1@bugtracker.com",
-                Email = "Developer1@bugtracker.com",
-                FirstName = "Elon",
+                UserName = "developer1@bugtracker.com",
+                Email = "developer1@bugtracker.com",
+                FirstName = "Luca",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -354,7 +354,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -371,9 +371,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer2 User
             defaultUser = new BTUser
             {
-                UserName = "Developer2@bugtracker.com",
-                Email = "Developer2@bugtracker.com",
-                FirstName = "James",
+                UserName = "developer2@bugtracker.com",
+                Email = "developer2@bugtracker.com",
+                FirstName = "Olga",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -383,7 +383,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -400,9 +400,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer3 User
             defaultUser = new BTUser
             {
-                UserName = "Developer3@bugtracker.com",
-                Email = "Developer3@bugtracker.com",
-                FirstName = "Natasha",
+                UserName = "developer3@bugtracker.com",
+                Email = "developer3@bugtracker.com",
+                FirstName = "Lina",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -412,7 +412,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -429,9 +429,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer4 User
             defaultUser = new BTUser
             {
-                UserName = "Developer4@bugtracker.com",
-                Email = "Developer4@bugtracker.com",
-                FirstName = "Carol",
+                UserName = "developer4@bugtracker.com",
+                Email = "developer4@bugtracker.com",
+                FirstName = "Jazmin",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -441,7 +441,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -458,9 +458,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer5 User
             defaultUser = new BTUser
             {
-                UserName = "Developer5@bugtracker.com",
-                Email = "Developer5@bugtracker.com",
-                FirstName = "Tony",
+                UserName = "developer5@bugtracker.com",
+                Email = "developer5@bugtracker.com",
+                FirstName = "Hector",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -470,7 +470,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -486,9 +486,9 @@ namespace TheBugTracker.Data
             //Seed Default Developer6 User
             defaultUser = new BTUser
             {
-                UserName = "Developer6@bugtracker.com",
-                Email = "Developer6@bugtracker.com",
-                FirstName = "Bruce",
+                UserName = "developer6@bugtracker.com",
+                Email = "developer6@bugtracker.com",
+                FirstName = "Eloise",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -498,7 +498,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Developer.ToString());
                 }
             }
@@ -514,9 +514,9 @@ namespace TheBugTracker.Data
             //Seed Default Submitter1 User
             defaultUser = new BTUser
             {
-                UserName = "Submitter1@bugtracker.com",
-                Email = "Submitter1@bugtracker.com",
-                FirstName = "Scott",
+                UserName = "submitter1@bugtracker.com",
+                Email = "submitter1@bugtracker.com",
+                FirstName = "Mark",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company1Id
@@ -526,7 +526,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Submitter.ToString());
                 }
             }
@@ -543,9 +543,9 @@ namespace TheBugTracker.Data
             //Seed Default Submitter2 User
             defaultUser = new BTUser
             {
-                UserName = "Submitter2@bugtracker.com",
-                Email = "Submitter2@bugtracker.com",
-                FirstName = "Sue",
+                UserName = "submitter2@bugtracker.com",
+                Email = "submitter2@bugtracker.com",
+                FirstName = "Trissa",
                 LastName = "Appuser",
                 EmailConfirmed = true,
                 CompanyId = company2Id
@@ -555,7 +555,7 @@ namespace TheBugTracker.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Abc&123!");
+                    await userManager.CreateAsync(defaultUser, "Password123!");
                     await userManager.AddToRoleAsync(defaultUser, Roles.Submitter.ToString());
                 }
             }
