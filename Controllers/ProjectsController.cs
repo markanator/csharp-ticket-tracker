@@ -25,8 +25,9 @@ namespace TheBugTracker.Controllers
         private readonly IFileService _fileService;
         private readonly IProjectService _projectService;
         private readonly UserManager<BTUser> _userManagerService;
+        private readonly ICompanyInfoService _companyInfoService;
 
-        public ProjectsController(ApplicationDbContext context, IRoleService roles, ILookupService lookup, IFileService file, IProjectService project, UserManager<BTUser> userManager)
+        public ProjectsController(ApplicationDbContext context, IRoleService roles, ILookupService lookup, IFileService file, IProjectService project, UserManager<BTUser> userManager, ICompanyInfoService companyInfo)
         {
             _context = context;
             _rolesService = roles;
@@ -34,6 +35,7 @@ namespace TheBugTracker.Controllers
             _fileService = file;
             _projectService = project;
             _userManagerService = userManager;
+            _companyInfoService = companyInfo;
         }
 
         // GET: Projects
@@ -43,11 +45,28 @@ namespace TheBugTracker.Controllers
             return View(projects);
         }
 
-        // GET: Projects
+        // GET: MyProjects
         public async Task<IActionResult> MyProjects()
         {
             string userId = _userManagerService.GetUserId(User);
             List<Project> projects = await _projectService.GetUserProjectsAsync(userId);
+
+            return View(projects);
+        }
+
+        // GET: All Projects
+        public async Task<IActionResult> AllProjects()
+        {
+
+            List<Project> projects = new();
+            if (User.IsInRole(nameof(Roles.Admin)) || User.IsInRole(nameof(Roles.Admin)))
+            {
+                projects = await _companyInfoService.GetAllProjectsAsync(User.Identity.GetCompanyId().Value);
+            }
+            else
+            {
+                projects = await _projectService.GetAllProjectsByCompany(User.Identity.GetCompanyId().Value);
+            }
 
             return View(projects);
         }
