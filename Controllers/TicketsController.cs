@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TheBugTracker.Data;
@@ -15,17 +16,19 @@ namespace TheBugTracker.Controllers
     public class TicketsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ITicketService _ticketService;
         private readonly UserManager<BTUser> _userManagerService;
         private readonly IProjectService _projectService;
         private readonly ILookupService _lookupService;
 
 
-        public TicketsController(ApplicationDbContext context, UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup)
+        public TicketsController(ApplicationDbContext context, UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup, ITicketService ticket)
         {
             _context = context;
             _userManagerService = userManager;
             _projectService = projectService;
             _lookupService = lookup;
+            _ticketService = ticket;
         }
 
         // GET: Tickets
@@ -37,7 +40,8 @@ namespace TheBugTracker.Controllers
                 .Include(t => t.Project)
                 .Include(t => t.TicketPriority)
                 .Include(t => t.TicketStatus)
-                .Include(t => t.TicketType);
+                .Include(t => t.TicketType)
+                .OrderBy(t => t.Created);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -88,24 +92,36 @@ namespace TheBugTracker.Controllers
         }
 
         // POST: Tickets/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Created,Updated,Archived,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,DeveloperUserId")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId")] Ticket ticket)
         {
+            BTUser user = await _userManagerService.GetUserAsync(User);
             if (ModelState.IsValid)
             {
-                _context.Add(ticket);
-                await _context.SaveChangesAsync();
+
+                ticket.Created = DateTimeOffset.Now;
+                ticket.OwnerUserId = user.Id; // this is how EFCore saves relationships
+                ticket.TicketStatusId = (await _ticketService.LookupTicketStatusIdAsync(nameof(Models.Enums.TicketStatus.New))).Value;
+
+                await _ticketService.AddNewTicketAsync(ticket);
+
+                //TODO: TICKET HISTORY
+                //TODO: NOTFICATIONs
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.DeveloperUserId);
-            ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.OwnerUserId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", ticket.ProjectId);
-            ViewData["TicketPriorityId"] = new SelectList(_context.TicketPriorities, "Id", "Id", ticket.TicketPriorityId);
-            ViewData["TicketStatusId"] = new SelectList(_context.TicketStatuses, "Id", "Id", ticket.TicketStatusId);
-            ViewData["TicketTypeId"] = new SelectList(_context.TicketTypes, "Id", "Id", ticket.TicketTypeId);
+
+            if (User.IsInRole(nameof(Roles.Admin)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompany(user.CompanyId), "Id", "Name");
+            }
+            else
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(user.Id), "Id", "Name");
+            }
+
+            ViewData["TicketPriorityId"] = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            ViewData["TicketTypeId"] = new SelectList(await _lookupService.GetAllTicketTypesAsync(), "Id", "Name");
             return View(ticket);
         }
 
