@@ -478,5 +478,19 @@ namespace TheBugTracker.Services
                 throw;
             }
         }
+
+        public async Task<bool> IsAssignedProjectManagerAsync(string userId, int projectId)
+        {
+            try
+            {
+                string pmId = (await this.GetProjectManagerAsync(projectId))?.Id;
+                return pmId == userId;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

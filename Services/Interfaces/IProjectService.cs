@@ -28,5 +28,6 @@ namespace TheBugTracker.Services.Interfaces
         Task RemoveUserFromProjectAsync(string userId, int projectId);
         Task UpdateProjectAsync(Project project);
         Task RestoreProjectAsync(Project project);
+        Task<bool> IsAssignedProjectManagerAsync(string userId, int projectId);
     }
 }
