@@ -45,7 +45,7 @@ namespace TheBugTracker.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Tickets
+        // GET: MyTickets
         public async Task<IActionResult> MyTickets()
         {
             var user = await _userManagerService.GetUserAsync(User);
@@ -54,7 +54,7 @@ namespace TheBugTracker.Controllers
             return View(tickets);
         }
 
-        // GET: Tickets
+        // GET: AllTickets
         public async Task<IActionResult> AllTickets()
         {
             var tickets = await _ticketService.GetAllTicketsByCompanyAsync(User.Identity.GetCompanyId().Value);
@@ -64,6 +64,14 @@ namespace TheBugTracker.Controllers
                 // filtered tickets view
                 return View(tickets.Where(t => t.Archived == false));
             }
+
+            return View(tickets);
+        }
+
+        // GET: ArchivedTickets
+        public async Task<IActionResult> ArchivedTickets()
+        {
+            var tickets = await _ticketService.GetArchivedTicketsAsync(User.Identity.GetCompanyId().Value);
 
             return View(tickets);
         }
