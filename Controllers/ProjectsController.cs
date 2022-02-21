@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +70,15 @@ namespace TheBugTracker.Controllers
             return View(projects);
         }
 
+        // GET: ArchivedProjects
+        public async Task<IActionResult> ArchivedProjects()
+        {
+            List<Project> projects = await _projectService.GetArchivedProjectsByCompany(User.Identity.GetCompanyId().Value);
+
+            return View(projects);
+        }
+
+
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -79,10 +87,8 @@ namespace TheBugTracker.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects
-                .Include(p => p.Company)
-                .Include(p => p.ProjectPriority)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var project = await _projectService.GetProjectByIdAsync(id.Value, User.Identity.GetCompanyId().Value);
+
             if (project == null)
             {
                 return NotFound();

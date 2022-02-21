@@ -133,7 +133,7 @@ namespace TheBugTracker.Services
         {
             List<Project> projects = new();
             // TODO: don't allow archived
-            projects = await _context.Projects.Where(p => p.CompanyId == companyId)
+            projects = await _context.Projects.Where(p => p.CompanyId == companyId && p.Archived == false)
                                             .Include(p => p.Members)
                                             .Include(p => p.Tickets)
                                                 .ThenInclude(t => t.TicketStatus)
@@ -168,8 +168,30 @@ namespace TheBugTracker.Services
 
         public async Task<List<Project>> GetArchivedProjectsByCompany(int companyId)
         {
-            List<Project> projects = await GetAllProjectsByCompany(companyId);
-            return projects.Where(p => p.Archived).ToList();
+            List<Project> projects = await _context.Projects.Where(p => p.CompanyId == companyId && p.Archived == true)
+                                            .Include(p => p.Members)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.TicketStatus)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.TicketPriority)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.TicketType)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.Comments)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.Attachments)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.History)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.DeveloperUser)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.OwnerUser)
+                                            .Include(p => p.Tickets)
+                                                .ThenInclude(t => t.Notifications)
+                                            .Include(p => p.ProjectPriority)
+                                            .ToListAsync();
+
+            return projects;
         }
 
         public async Task<List<BTUser>> GetDevelopersOnProjectAsync(int projectId)
@@ -182,10 +204,25 @@ namespace TheBugTracker.Services
         {
             try
             {
-                return await _context.Projects.Include(p => p.Tickets)
-                                                     .Include(p => p.Members)
-                                                     .Include(p => p.ProjectPriority)
-                                                     .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
+                /*.Include(p => p.Tickets)
+                    .ThenInclude(t => t.Comments)
+                .Include(p => p.Tickets)
+                    .ThenInclude(t => t.Attachments)
+                .Include(p => p.Tickets)
+                    .ThenInclude(t => t.History)*/
+                return await _context.Projects.Include(p => p.Members)
+                                                .Include(p => p.ProjectPriority)
+                                                .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.TicketStatus)
+                                                .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.TicketPriority)
+                                                .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.TicketType)
+                                                .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.DeveloperUser)
+                                                .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.OwnerUser)
+                                                .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
             }
             catch (Exception)
             {
