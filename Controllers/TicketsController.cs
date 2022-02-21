@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TheBugTracker.Data;
@@ -20,15 +21,16 @@ namespace TheBugTracker.Controllers
 		private readonly UserManager<BTUser> _userManagerService;
 		private readonly IProjectService _projectService;
 		private readonly ILookupService _lookupService;
+		private readonly IFileService _fileService;
 
-
-		public TicketsController(ApplicationDbContext context, UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup, ITicketService ticket)
+		public TicketsController(ApplicationDbContext context, UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup, ITicketService ticket, IFileService file)
 		{
 			_context = context;
 			_userManagerService = userManager;
 			_projectService = projectService;
 			_lookupService = lookup;
 			_ticketService = ticket;
+			_fileService = file;
 		}
 
 		// GET: Tickets
@@ -270,7 +272,7 @@ namespace TheBugTracker.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		// POST: Tickets/Restore/5
+		// POST: Tickets/AddTicketComment
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddTicketComment([Bind("Id, Comment,TicketId")] TicketComment ticketComment)
@@ -293,6 +295,47 @@ namespace TheBugTracker.Controllers
 			// redirect to correct details page
 			return RedirectToAction(nameof(Details), new { id = ticketComment.TicketId });
 		}
+
+		// POST: Tickets/AddTicketAttachment
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddTicketAttachment([Bind("Id,FormFile,Description,TicketId")] TicketAttachment ticketAttachment)
+		{
+			string statusMessage;
+
+			if (ModelState.IsValid && ticketAttachment.FormFile != null)
+			{
+				ticketAttachment.FileData = await _fileService.ConverFileToByteArrayAsync(ticketAttachment.FormFile);
+				ticketAttachment.FileName = ticketAttachment.FormFile.FileName;
+				ticketAttachment.FileContentType = ticketAttachment.FormFile.ContentType;
+
+				ticketAttachment.Created = DateTimeOffset.Now;
+				ticketAttachment.UserId = _userManagerService.GetUserId(User);
+
+				await _ticketService.AddTicketAttachmentAsync(ticketAttachment);
+				statusMessage = "Success: New attachment added to Ticket.";
+			}
+			else
+			{
+				statusMessage = "Error: Invalid data.";
+
+			}
+
+			return RedirectToAction(nameof(Details), new { id = ticketAttachment.TicketId, message = statusMessage });
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ShowFile(int id)
+		{
+			TicketAttachment ticketAttachment = await _ticketService.GetTicketAttachmentByIdAsync(id);
+			string fileName = ticketAttachment.FileName;
+			byte[] fileData = ticketAttachment.FileData;
+			string ext = Path.GetExtension(fileName).Replace(".", "");
+
+			Response.Headers.Add("Content-Disposition", $"inline; filename={fileName}");
+			return File(fileData, $"application/{ext}");
+		}
+
 		private async Task<bool> TicketExists(int id)
 		{
 			return (await _ticketService.GetAllTicketsByCompanyAsync(User.Identity.GetCompanyId().Value)).Any(t => t.Id == id);
