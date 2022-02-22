@@ -421,6 +421,19 @@ namespace TheBugTracker.Services
 			}
 		}
 
+		public async Task<List<Ticket>> GetUnassignTicketsAsync(int companyId)
+		{
+			try
+			{
+				return (await GetAllTicketsByCompanyAsync(companyId)).Where(t => string.IsNullOrEmpty(t.DeveloperUserId)).ToList();
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
+		}
+
 		public async Task<int?> LookupTicketPriorityIdAsync(string priorityName)
 		{
 			try

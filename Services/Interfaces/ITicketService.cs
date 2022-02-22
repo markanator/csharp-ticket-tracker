@@ -6,29 +6,29 @@ namespace TheBugTracker.Services.Interfaces
 {
 	public interface ITicketService
 	{
-		public Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment);
-		// CRUD Methods
-		public Task AddNewTicketAsync(Ticket ticket);
-		public Task AddTicketCommentAsync(TicketComment comment);
-		public Task ArchiveTicketAsync(Ticket ticket);
-		public Task AssignTicketAsync(int ticketId, string userId);
-		public Task UpdateTicketAsync(Ticket ticket);
-		public Task<Ticket> GetTicketByIdAsync(int ticketId);
-		public Task<List<Ticket>> GetArchivedTicketsAsync(int companyId);
-		public Task<List<Ticket>> GetAllTicketsByCompanyAsync(int companyId);
-		public Task<List<Ticket>> GetAllTicketsByPriorityAsync(int companyId, string priorityName);
-		public Task<List<Ticket>> GetAllTicketsByStatusAsync(int companyId, string statusName);
-		public Task<List<Ticket>> GetAllTicketsByTypeAsync(int companyId, string typeName);
-		public Task<TicketAttachment> GetTicketAttachmentByIdAsync(int ticketAttachmentId);
-		public Task<BTUser> GetTicketDeveloperAsync(int ticketId, int companyId);
-		public Task<List<Ticket>> GetTicketsByRoleAsync(string role, string userId, int companyId);
-		public Task<List<Ticket>> GetTicketsByUserIdAsync(string userId, int companyId);
-		public Task<List<Ticket>> GetProjectTicketsByRoleAsync(string role, string userId, int projectId, int companyId);
-		public Task<List<Ticket>> GetProjectTicketsByStatusAsync(string statusName, int companyId, int projectId);
-		public Task<List<Ticket>> GetProjectTicketsByPriorityAsync(string priorityName, int companyId, int projectId);
-		public Task<List<Ticket>> GetProjectTicketsByTypeAsync(string typeName, int companyId, int projectId);
-		public Task<int?> LookupTicketPriorityIdAsync(string priorityName);
-		public Task<int?> LookupTicketStatusIdAsync(string statusName);
-		public Task<int?> LookupTicketTypeIdAsync(string typeName);
+		Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment);
+		Task AddNewTicketAsync(Ticket ticket);
+		Task AddTicketCommentAsync(TicketComment comment);
+		Task ArchiveTicketAsync(Ticket ticket);
+		Task AssignTicketAsync(int ticketId, string userId);
+		Task UpdateTicketAsync(Ticket ticket);
+		Task<Ticket> GetTicketByIdAsync(int ticketId);
+		Task<List<Ticket>> GetArchivedTicketsAsync(int companyId);
+		Task<List<Ticket>> GetAllTicketsByCompanyAsync(int companyId);
+		Task<List<Ticket>> GetAllTicketsByPriorityAsync(int companyId, string priorityName);
+		Task<List<Ticket>> GetAllTicketsByStatusAsync(int companyId, string statusName);
+		Task<List<Ticket>> GetAllTicketsByTypeAsync(int companyId, string typeName);
+		Task<TicketAttachment> GetTicketAttachmentByIdAsync(int ticketAttachmentId);
+		Task<BTUser> GetTicketDeveloperAsync(int ticketId, int companyId);
+		Task<List<Ticket>> GetTicketsByRoleAsync(string role, string userId, int companyId);
+		Task<List<Ticket>> GetTicketsByUserIdAsync(string userId, int companyId);
+		Task<List<Ticket>> GetProjectTicketsByRoleAsync(string role, string userId, int projectId, int companyId);
+		Task<List<Ticket>> GetProjectTicketsByStatusAsync(string statusName, int companyId, int projectId);
+		Task<List<Ticket>> GetProjectTicketsByPriorityAsync(string priorityName, int companyId, int projectId);
+		Task<List<Ticket>> GetUnassignTicketsAsync(int companyId);
+		Task<List<Ticket>> GetProjectTicketsByTypeAsync(string typeName, int companyId, int projectId);
+		Task<int?> LookupTicketPriorityIdAsync(string priorityName);
+		Task<int?> LookupTicketStatusIdAsync(string statusName);
+		Task<int?> LookupTicketTypeIdAsync(string typeName);
 	}
 }

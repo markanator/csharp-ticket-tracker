@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -78,6 +80,36 @@ namespace TheBugTracker.Controllers
 			return View(tickets);
 		}
 
+		// GET: UnassignedTickets
+		[Authorize(Roles = "Admin,ProjectManager")]
+		public async Task<IActionResult> UnassignedTickets()
+		{
+			try
+			{
+				var tickets = new List<Ticket>();
+
+				if (User.IsInRole(nameof(Roles.Admin)))
+				{
+					tickets = await _ticketService.GetUnassignTicketsAsync(User.Identity.GetCompanyId().Value);
+				}
+				else
+				{
+					foreach (var ticket in tickets)
+					{
+						if (await _projectService.IsAssignedProjectManagerAsync(_userManagerService.GetUserId(User), ticket.Id))
+						{
+							tickets.Add(ticket);
+						}
+					}
+				}
+				return View(tickets);
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
+		}
 
 		// GET: Tickets/Details/5
 		public async Task<IActionResult> Details(int? id)
