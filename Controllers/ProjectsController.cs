@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TheBugTracker.Data;
 using TheBugTracker.Extensions;
 using TheBugTracker.Models;
 using TheBugTracker.Models.Enums;
@@ -18,7 +18,6 @@ namespace TheBugTracker.Controllers
     [Authorize]
     public class ProjectsController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IRoleService _rolesService;
         private readonly ILookupService _lookupService;
         private readonly IFileService _fileService;
@@ -26,9 +25,8 @@ namespace TheBugTracker.Controllers
         private readonly UserManager<BTUser> _userManagerService;
         private readonly ICompanyInfoService _companyInfoService;
 
-        public ProjectsController(ApplicationDbContext context, IRoleService roles, ILookupService lookup, IFileService file, IProjectService project, UserManager<BTUser> userManager, ICompanyInfoService companyInfo)
+        public ProjectsController(IRoleService roles, ILookupService lookup, IFileService file, IProjectService project, UserManager<BTUser> userManager, ICompanyInfoService companyInfo)
         {
-            _context = context;
             _rolesService = roles;
             _lookupService = lookup;
             _fileService = file;
@@ -240,10 +238,16 @@ namespace TheBugTracker.Controllers
                         await _projectService.AddProjectManagerAsync(model.PmId, model.Project.Id);
                     }
                 }
-                catch (Exception)
+                catch (DbUpdateConcurrencyException)
                 {
-
-                    throw;
+                    if (!await this.ProjectExists(model.Project.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
                 // TODO: redirect to all projects
                 return RedirectToAction(nameof(Index));
@@ -347,9 +351,9 @@ namespace TheBugTracker.Controllers
             return RedirectToAction(nameof(AssignPM), new { id = model.Project.Id });
         }
 
-        private bool ProjectExists(int id)
+        private async Task<bool> ProjectExists(int id)
         {
-            return _context.Projects.Any(e => e.Id == id);
+            return (await _projectService.GetArchivedProjectsByCompany(User.Identity.GetCompanyId().Value)).Any(p => p.Id == id);
         }
     }
 }
