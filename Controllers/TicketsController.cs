@@ -112,6 +112,7 @@ namespace TheBugTracker.Controllers
 			}
 		}
 
+		// GET: AssignDeveloper
 		[HttpGet]
 		public async Task<IActionResult> AssignDeveloper(int id)
 		{
@@ -120,6 +121,20 @@ namespace TheBugTracker.Controllers
 			vm.Developers = new SelectList(await _projectService.GetProjectMembersByRoleAsync(vm.Ticket.ProjectId, nameof(Roles.Developer)), "Id", "FullName");
 
 			return View(vm);
+		}
+
+		// POST: AssignDeveloper
+		[HttpPost]
+		[AutoValidateAntiforgeryToken]
+		public async Task<IActionResult> AssignDeveloper(AssignDeveloperViewModel model)
+		{
+			if (model.DeveloperId != null)
+			{
+				await _ticketService.AssignTicketAsync(model.Ticket.Id, model.DeveloperId);
+				RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
+			}
+
+			return RedirectToAction(nameof(AssignDeveloper), new { id = model.Ticket.Id });
 		}
 
 		// GET: Tickets/Details/5
