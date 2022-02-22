@@ -31,6 +31,18 @@ namespace TheBugTracker.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(nameof(Dashboard));
+            }
+            else
+            {
+                return RedirectToAction(nameof(Landing));
+            }
+        }
+
+        public IActionResult Landing()
+        {
             return View();
         }
 
