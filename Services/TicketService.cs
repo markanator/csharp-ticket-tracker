@@ -470,7 +470,8 @@ namespace TheBugTracker.Services
         {
             try
             {
-                return (await _context.TicketStatuses.FirstOrDefaultAsync(p => p.Name == statusName))?.Id;
+                int statusId = (await _context.TicketStatuses.FirstOrDefaultAsync(p => p.Name == statusName)).Id;
+                return statusId;
             }
             catch (Exception)
             {

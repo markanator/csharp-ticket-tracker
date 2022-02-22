@@ -116,10 +116,15 @@ namespace TheBugTracker.Controllers
 
         // GET: AssignDeveloper
         [HttpGet]
-        public async Task<IActionResult> AssignDeveloper(int id)
+        public async Task<IActionResult> AssignDeveloper(int? id)
         {
+            if (!id.HasValue)
+            {
+                return NotFound();
+            }
+
             AssignDeveloperViewModel vm = new();
-            vm.Ticket = await _ticketService.GetTicketByIdAsync(id);
+            vm.Ticket = await _ticketService.GetTicketByIdAsync(id.Value);
             vm.Developers = new SelectList(await _projectService.GetProjectMembersByRoleAsync(vm.Ticket.ProjectId, nameof(Roles.Developer)), "Id", "FullName");
 
             return View(vm);
@@ -127,12 +132,12 @@ namespace TheBugTracker.Controllers
 
         // POST: AssignDeveloper
         [HttpPost]
-        [AutoValidateAntiforgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignDeveloper(AssignDeveloperViewModel model)
         {
             try
             {
-                if (model.DeveloperId != null)
+                if (!string.IsNullOrEmpty(model.DeveloperId))
                 {
                     var user = await _userManagerService.GetUserAsync(User);
                     var oldTicket = await _ticketService.GetTicketAsNoTrackingAsync(model.Ticket.Id);
@@ -142,8 +147,9 @@ namespace TheBugTracker.Controllers
                     var newTicket = await _ticketService.GetTicketAsNoTrackingAsync(model.Ticket.Id);
                     await _historyService.AddHistoryAsync(oldTicket, newTicket, user.Id);
 
-                    RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
+                    return RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
                 }
+
             }
             catch (Exception)
             {

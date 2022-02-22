@@ -15,18 +15,18 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="post" asp-action="AssignDeveloper" asp-controller="Tickets">
-                        <input type="hidden" asp-for="Ticket.Id" />
+                    <form method="post" asp-action="AssignDeveloper">
+                        <input asp-for="@Model.Ticket.Id" hidden />
+                        <input asp-for="@Model.Ticket.ProjectId" hidden />
+
                         <p>Description: @Model.Ticket.Description</p>
 
                         <div class="">
                             <div class="form-group">
                                 <label>Select Developers:</label>
-                                <select required asp-for="DeveloperId" class="form-control"
-                                    asp-items="@Model.Developers"
-                                >
-                                <option>--- Select Developer ---</option>
-                            </select>
+                                <select class="form-control" asp-for="DeveloperId" asp-items="@Model.Developers">
+                                    <option>Select Developer</option>
+                                </select>
                             </div>
                         </div>
 
