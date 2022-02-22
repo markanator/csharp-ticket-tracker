@@ -81,37 +81,47 @@ namespace TheBugTracker.Controllers
         // GET: /Projects/AssignMembers
         public async Task<IActionResult> AssignMembers(int id)
         {
-            var vm = new ProjectMembersViewModel();
-            vm.Project = await _projectService.GetProjectByIdAsync(id, User.Identity.GetCompanyId().Value);
-            vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "FullName");
+            var model = new ProjectMembersViewModel();
+            model.Project = await _projectService.GetProjectByIdAsync(id, User.Identity.GetCompanyId().Value);
 
-            return View(vm);
+            List<BTUser> devs = await _rolesService.GetUsersInRoleAsync(nameof(Roles.Developer), User.Identity.GetCompanyId().Value);
+            List<BTUser> submitters = await _rolesService.GetUsersInRoleAsync(nameof(Roles.Submitter), User.Identity.GetCompanyId().Value);
+            // combine above fetch members
+            List<BTUser> companyMembers = devs.Concat(submitters).ToList();
+            // preselected members already in project
+            List<string> ogProjectMembers = model.Project.Members.Select(m => m.Id).ToList();
+
+            model.Members = new MultiSelectList(companyMembers, "Id", "FullName", ogProjectMembers);
+
+            return View(model);
         }
 
         // POST: /Projects/AssignMembers
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AssignMembers(ProjectMembersViewModel pVm)
+        public async Task<IActionResult> AssignMembers(ProjectMembersViewModel model)
         {
             try
             {
-                if (pVm.SelectedMembers.Count > 0)
+                if (model.SelectedMembers != null)
                 {
-                    foreach (var member in pVm.SelectedMembers)
+                    // fetch current project members except PM
+                    List<string> memberIds = (await _projectService.GetAllProjectMembersExceptPMAsync(model.Project.Id)).Select(m => m.Id).ToList();
+                    // remove EXISTING MEMBERS
+                    foreach (string memberId in memberIds)
                     {
-                        await _projectService.AddUserToProjectAsync(member, pVm.Project.Id);
+                        await _projectService.RemoveUserFromProjectAsync(memberId, model.Project.Id);
                     }
 
-                    return RedirectToAction(nameof(Details), new { id = pVm.Project.Id });
-                }
-                else
-                {
-                    var vm = new ProjectMembersViewModel();
-                    vm.Project = await _projectService.GetProjectByIdAsync(pVm.Project.Id, User.Identity.GetCompanyId().Value);
-                    vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "FullName");
+                    foreach (var member in model.SelectedMembers)
+                    {
+                        await _projectService.AddUserToProjectAsync(member, model.Project.Id);
+                    }
 
-                    return View(vm);
+                    return RedirectToAction(nameof(Details), "Projects", new { id = model.Project.Id });
                 }
+
+                return RedirectToAction(nameof(AssignMembers), new { id = model.Project.Id });
             }
             catch (Exception)
             {
