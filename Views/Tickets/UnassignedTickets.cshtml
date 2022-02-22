@@ -32,13 +32,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @* 
-                                            TABLE BODY
-                                        *@
+
                                         @foreach (var ticket in Model.OrderByDescending(d => d.Created))
                                         {
                                             <tr>
-                                                <td><a asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id" style="color:black"><strong>@ticket.Title</strong></a> </td>
+                                                <td>
+                                                    <a 
+                                                        asp-action="Details" 
+                                                        asp-controller="Tickets" 
+                                                        asp-route-id="@ticket.Id" 
+                                                        style="color:black"
+                                                    >
+                                                        <strong>@ticket.Title</strong>
+                                                    </a> 
+                                                </td>
                                                 <td>
                                                     @if (ticket.DeveloperUserId != null)
                                                     {
