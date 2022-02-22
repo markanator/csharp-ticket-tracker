@@ -129,7 +129,7 @@ namespace TheBugTracker.Services
             return devs.Concat(reporters).Concat(admins).ToList();
         }
 
-        public async Task<List<Project>> GetAllProjectsByCompany(int companyId)
+        public async Task<List<Project>> GetAllProjectsByCompanyAsync(int companyId)
         {
             List<Project> projects = new();
             // TODO: don't allow archived
@@ -159,15 +159,15 @@ namespace TheBugTracker.Services
             return projects;
         }
 
-        public async Task<List<Project>> GetAllProjectsByPriority(int companyId, string priorityName)
+        public async Task<List<Project>> GetAllProjectsByPriorityAsync(int companyId, string priorityName)
         {
-            List<Project> projects = await GetAllProjectsByCompany(companyId);
-            int pId = await LookupProjectPriorityId(priorityName);
+            List<Project> projects = await GetAllProjectsByCompanyAsync(companyId);
+            int pId = await LookupProjectPriorityIdAsync(priorityName);
 
             return projects.Where(p => p.ProjectPriorityId == pId).ToList();
         }
 
-        public async Task<List<Project>> GetArchivedProjectsByCompany(int companyId)
+        public async Task<List<Project>> GetArchivedProjectsByCompanyAsync(int companyId)
         {
             List<Project> projects = await _context.Projects.Where(p => p.CompanyId == companyId && p.Archived == true)
                                             .Include(p => p.Members)
@@ -353,7 +353,7 @@ namespace TheBugTracker.Services
             return false;
         }
 
-        public async Task<int> LookupProjectPriorityId(string priorityName)
+        public async Task<int> LookupProjectPriorityIdAsync(string priorityName)
         {
             try
             {
