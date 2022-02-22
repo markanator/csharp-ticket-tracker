@@ -74,7 +74,7 @@ namespace TheBugTracker.Services
 
             if (companyId != null)
             {
-                await _context.Companies
+                return await _context.Companies
                     .Include(c => c.Members)
                     .Include(c => c.Projects)
                     .Include(c => c.Invites)
