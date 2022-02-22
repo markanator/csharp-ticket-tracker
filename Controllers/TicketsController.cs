@@ -13,6 +13,7 @@ using TheBugTracker.Extensions;
 using TheBugTracker.Models;
 using TheBugTracker.Models.Enums;
 using TheBugTracker.Services.Interfaces;
+using TheBugTracker.ViewModels;
 
 namespace TheBugTracker.Controllers
 {
@@ -109,6 +110,16 @@ namespace TheBugTracker.Controllers
 
 				throw;
 			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AssignDeveloper(int id)
+		{
+			AssignDeveloperViewModel vm = new();
+			vm.Ticket = await _ticketService.GetTicketByIdAsync(id);
+			vm.Developers = new SelectList(await _projectService.GetProjectMembersByRoleAsync(vm.Ticket.ProjectId, nameof(Roles.Developer)), "Id", "FullName");
+
+			return View(vm);
 		}
 
 		// GET: Tickets/Details/5
