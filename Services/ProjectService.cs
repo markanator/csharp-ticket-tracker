@@ -154,6 +154,7 @@ namespace TheBugTracker.Services
                                             .Include(p => p.Tickets)
                                                 .ThenInclude(t => t.Notifications)
                                             .Include(p => p.ProjectPriority)
+                                            .Include(p => p.Company)
                                             .ToListAsync();
             return projects;
         }

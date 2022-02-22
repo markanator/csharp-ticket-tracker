@@ -43,9 +43,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Archived)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.ProjectPriority)
             </th>
@@ -84,11 +82,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Archived)
             </td>
+
             <td>
-                @Html.DisplayFor(modelItem => item.Company.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProjectPriority.Id)
+                @Html.DisplayFor(modelItem => item.ProjectPriority.Name)
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a>

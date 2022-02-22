@@ -90,7 +90,7 @@ namespace TheBugTracker.Controllers
 
         // POST: /Projects/AssignMembers
         [HttpPost]
-        [AutoValidateAntiforgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignMembers(ProjectMembersViewModel pVm)
         {
             try
@@ -302,12 +302,39 @@ namespace TheBugTracker.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Projects/UnassignedProjects
         [HttpGet]
         public async Task<IActionResult> UnassignedProjects()
         {
             var projects = await _projectService.GetUnassignedProjectsAsync(User.Identity.GetCompanyId().Value);
 
             return View(projects);
+        }
+
+        // Get: Projects/AssignPM
+        [HttpGet]
+        public async Task<IActionResult> AssignPM(int id)
+        {
+            AssignPMViewModel model = new();
+            model.Project = await _projectService.GetProjectByIdAsync(id, User.Identity.GetCompanyId().Value);
+            model.ProjectManagerList = new SelectList(await _rolesService.GetUsersInRoleAsync(nameof(Roles.ProjectManager), User.Identity.GetCompanyId().Value), "Id", "FullName");
+
+            return View(model);
+        }
+
+        // Get: Projects/AssignPM
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignPM(AssignPMViewModel model)
+        {
+            if (!string.IsNullOrEmpty(model.PMID))
+            {
+                await _projectService.AddProjectManagerAsync(model.PMID, model.Project.Id);
+
+                return RedirectToAction(nameof(Details), new { id = model.Project.Id });
+            }
+
+            return RedirectToAction(nameof(AssignPM), new { id = model.Project.Id });
         }
 
         private bool ProjectExists(int id)
