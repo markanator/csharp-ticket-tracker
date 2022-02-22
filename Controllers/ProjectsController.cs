@@ -83,7 +83,7 @@ namespace TheBugTracker.Controllers
 		{
 			var vm = new ProjectMembersViewModel();
 			vm.Project = await _projectService.GetProjectByIdAsync(id, User.Identity.GetCompanyId().Value);
-			vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "Name");
+			vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "FullName");
 
 			return View(vm);
 		}
@@ -108,7 +108,7 @@ namespace TheBugTracker.Controllers
 				{
 					var vm = new ProjectMembersViewModel();
 					vm.Project = await _projectService.GetProjectByIdAsync(pVm.Project.Id, User.Identity.GetCompanyId().Value);
-					vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "Name");
+					vm.Members = new SelectList(await _companyInfoService.GetAllMembersAsync(User.Identity.GetCompanyId().Value), "Id", "FullName");
 
 					return View(vm);
 				}
