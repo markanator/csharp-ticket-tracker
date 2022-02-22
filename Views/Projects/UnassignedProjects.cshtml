@@ -1,14 +1,15 @@
 ﻿@model IEnumerable<TheBugTracker.Models.Project>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Unassigned Projects";
 }
 
-<h1>Index</h1>
+<h1>Unassigned Projects</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
@@ -31,9 +32,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Archived)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.ProjectPriority)
             </th>
@@ -72,23 +71,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Archived)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Company.Name)
-            </td>
+
             <td>
                 @Html.DisplayFor(modelItem => item.ProjectPriority.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                @if (item?.Archived == true)
-                {
-                    <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
-                } 
-                    else
-                {
-                    <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
-                }
+                <a asp-action="AssignPM" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Add PM</a>
             </td>
         </tr>
 }

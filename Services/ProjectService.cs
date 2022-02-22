@@ -492,5 +492,29 @@ namespace TheBugTracker.Services
                 throw;
             }
         }
+
+        public async Task<List<Project>> GetUnassignedProjectsAsync(int companyId)
+        {
+            var res = new List<Project>();
+            try
+            {
+                var projects = await _context.Projects.Include(p => p.ProjectPriority).Where(p => p.CompanyId == companyId).ToListAsync();
+
+                foreach (var project in projects)
+                {
+                    if ((await this.GetProjectMembersByRoleAsync(project.Id, nameof(Roles.ProjectManager))).Count == 0)
+                    {
+                        res.Add(project);
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return res;
+        }
     }
 }
