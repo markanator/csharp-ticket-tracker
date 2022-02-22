@@ -286,6 +286,25 @@ namespace TheBugTracker.Services
 			}
 		}
 
+		public async Task<Ticket> GetTicketAsNoTrackingAsync(int ticketId)
+		{
+			try
+			{
+				return await _context.Tickets.Include(t => t.DeveloperUser)
+											 .Include(t => t.Project)
+											 .Include(t => t.TicketPriority)
+											 .Include(t => t.TicketStatus)
+											 .Include(t => t.TicketType)
+											 .AsNoTracking() // just need to view data
+											 .FirstOrDefaultAsync(m => m.Id == ticketId);
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
+		}
+
 		public async Task<TicketAttachment> GetTicketAttachmentByIdAsync(int ticketAttachmentId)
 		{
 			try

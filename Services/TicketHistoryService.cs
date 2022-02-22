@@ -22,7 +22,8 @@ namespace TheBugTracker.Services
             // new ticket being added
             if (oldTicket == null && newTicket != null)
             {
-                var history = new TicketHistory() {
+                var history = new TicketHistory()
+                {
                     TicketId = newTicket.Id,
                     Property = "",
                     OldValue = "",
@@ -207,20 +208,47 @@ namespace TheBugTracker.Services
                 }
             }
         }
+        public async Task AddHistoryAsync(int ticketId, string model, string userId)
+        {
+            try
+            {
+                // for comments and attachements
+                var ticket = await _context.Tickets.FindAsync(ticketId);
+                string description = model.ToLower().Replace("Ticket", "");
 
+                TicketHistory history = new TicketHistory()
+                {
+                    TicketId = ticketId,
+                    Property = model,
+                    OldValue = "",
+                    NewValue = "",
+                    Created = DateTimeOffset.Now,
+                    UserId = userId,
+                    Description = $"New {description} add to ticket: {ticket.Title}"
+                };
+
+                await _context.TicketHistories.AddAsync(history);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public async Task<List<TicketHistory>> GetCompanyTicketsHisotriesAsync(int companyId)
         {
             try
             {
-                var projects = (await _context.Companies.Include(c=>c.Projects)
-                                                        .ThenInclude(p=>p.Tickets)
-                                                            .ThenInclude(t=>t.History)
-                                                                .ThenInclude(h=>h.User)
-                                                        .FirstOrDefaultAsync(c=>c.Id == companyId)).Projects.ToList();
+                var projects = (await _context.Companies.Include(c => c.Projects)
+                                                        .ThenInclude(p => p.Tickets)
+                                                            .ThenInclude(t => t.History)
+                                                                .ThenInclude(h => h.User)
+                                                        .FirstOrDefaultAsync(c => c.Id == companyId)).Projects.ToList();
 
                 var tickets = projects.SelectMany(p => p.Tickets).ToList();
-                
-                return tickets.SelectMany(t=>t.History).ToList();
+
+                return tickets.SelectMany(t => t.History).ToList();
 
             }
             catch (Exception)
@@ -229,18 +257,17 @@ namespace TheBugTracker.Services
                 throw;
             }
         }
-
         public async Task<List<TicketHistory>> GetProjectTicketsHisotriesAsync(int projectId, int companyId)
         {
             try
             {
                 var project = await _context.Projects.Where(p => p.CompanyId == companyId)
-                                                        .Include(p=>p.Tickets)
-                                                            .ThenInclude(t=>t.History)
-                                                                .ThenInclude(h=>h.User)
-                                                        .FirstOrDefaultAsync(p=>p.Id == projectId);
-                
-                return project.Tickets.SelectMany(t=>t.History).ToList();
+                                                        .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.History)
+                                                                .ThenInclude(h => h.User)
+                                                        .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                return project.Tickets.SelectMany(t => t.History).ToList();
 
             }
             catch (Exception)
