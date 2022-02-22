@@ -35,13 +35,6 @@ namespace TheBugTracker.Controllers
             _companyInfoService = companyInfo;
         }
 
-        // GET: Projects
-        public async Task<IActionResult> Index()
-        {
-            var projects = await _projectService.GetAllProjectsByCompany(User.Identity.GetCompanyId().Value);
-            return View(projects);
-        }
-
         // GET: MyProjects
         public async Task<IActionResult> MyProjects()
         {

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TheBugTracker.Data;
 using TheBugTracker.Extensions;
 using TheBugTracker.Models;
 using TheBugTracker.Models.Enums;
@@ -19,7 +18,7 @@ namespace TheBugTracker.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+
         private readonly ITicketService _ticketService;
         private readonly UserManager<BTUser> _userManagerService;
         private readonly IProjectService _projectService;
@@ -27,29 +26,14 @@ namespace TheBugTracker.Controllers
         private readonly IFileService _fileService;
         private readonly ITicketHistoryService _historyService;
 
-        public TicketsController(ApplicationDbContext context, UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup, ITicketService ticket, IFileService file, ITicketHistoryService history)
+        public TicketsController(UserManager<BTUser> userManager, IProjectService projectService, ILookupService lookup, ITicketService ticket, IFileService file, ITicketHistoryService history)
         {
-            _context = context;
             _userManagerService = userManager;
             _projectService = projectService;
             _lookupService = lookup;
             _ticketService = ticket;
             _fileService = file;
             _historyService = history;
-        }
-
-        // GET: Tickets
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Tickets
-                .Include(t => t.DeveloperUser)
-                .Include(t => t.OwnerUser)
-                .Include(t => t.Project)
-                .Include(t => t.TicketPriority)
-                .Include(t => t.TicketStatus)
-                .Include(t => t.TicketType)
-                .OrderBy(t => t.Created);
-            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: MyTickets
