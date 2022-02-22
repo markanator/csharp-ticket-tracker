@@ -55,7 +55,7 @@ namespace TheBugTracker.Controllers
             }
             else
             {
-                projects = await _projectService.GetAllProjectsByCompany(User.Identity.GetCompanyId().Value);
+                projects = await _projectService.GetAllProjectsByCompanyAsync(User.Identity.GetCompanyId().Value);
             }
 
             return View(projects);
@@ -64,7 +64,7 @@ namespace TheBugTracker.Controllers
         // GET: /Projects/ArchivedProjects
         public async Task<IActionResult> ArchivedProjects()
         {
-            List<Project> projects = await _projectService.GetArchivedProjectsByCompany(User.Identity.GetCompanyId().Value);
+            List<Project> projects = await _projectService.GetArchivedProjectsByCompanyAsync(User.Identity.GetCompanyId().Value);
 
             return View(projects);
         }
@@ -356,7 +356,7 @@ namespace TheBugTracker.Controllers
 
         private async Task<bool> ProjectExists(int id)
         {
-            return (await _projectService.GetArchivedProjectsByCompany(User.Identity.GetCompanyId().Value)).Any(p => p.Id == id);
+            return (await _projectService.GetArchivedProjectsByCompanyAsync(User.Identity.GetCompanyId().Value)).Any(p => p.Id == id);
         }
     }
 }

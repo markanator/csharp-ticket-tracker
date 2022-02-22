@@ -409,19 +409,19 @@ namespace TheBugTracker.Services
 
                 if (await _roleService.IsUserInRoleAsync(user, Roles.Admin.ToString()))
                 {
-                    ticketList = (await _projectService.GetAllProjectsByCompany(companyId))
+                    ticketList = (await _projectService.GetAllProjectsByCompanyAsync(companyId))
                                                         .SelectMany(p => p.Tickets).ToList();
                 }
                 else if (await _roleService.IsUserInRoleAsync(user, Roles.Developer.ToString()))
                 {
-                    ticketList = (await _projectService.GetAllProjectsByCompany(companyId))
+                    ticketList = (await _projectService.GetAllProjectsByCompanyAsync(companyId))
                                                         .SelectMany(p => p.Tickets)
                                                         .Where(t => t.DeveloperUserId == userId)
                                                         .ToList();
                 }
                 else if (await _roleService.IsUserInRoleAsync(user, Roles.Submitter.ToString()))
                 {
-                    ticketList = (await _projectService.GetAllProjectsByCompany(companyId))
+                    ticketList = (await _projectService.GetAllProjectsByCompanyAsync(companyId))
                                                         .SelectMany(p => p.Tickets)
                                                         .Where(t => t.OwnerUserId == userId)
                                                         .ToList();
