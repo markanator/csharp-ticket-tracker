@@ -190,9 +190,7 @@
 								<h2>Attachments</h2>
 							</div>
 							<div class="card-body" style="overflow-y:auto;height:300px;">
-						
-								@* Refer to the Ticket Attachments document for this section *@
-								@* Ticket attachments part 1 here *@
+
 								<div class="row clearfix">
 									 <div>
 										  <form asp-action="AddTicketAttachment" asp-controller="Tickets" enctype="multipart/form-data" method="post">
@@ -211,7 +209,7 @@
 										  </form>
 									 </div>
 								</div>
-								@* Ticket attachments part 2 here *@
+
 								<hr />
 								<h6>Attachments</h6>
 								<div class="container">
@@ -258,16 +256,28 @@
 							@foreach (TicketHistory history in Model.History)
                             {
                                 <div>
-                                    <span class="date">@history.Created.ToString("MMM dd, yyyy")</span>
+                                    <strong class="date">@history.Created.ToString("MMM dd, yyyy")</strong>
                                     <h6>@history.Description</h6>
                                     <span>By: <a href="#" title="@history.User.FullName">@history.User.FullName</a></span>
                                     <div>
-                                        <p>The ticket <strong>@history.Property</strong> was edited</p>
-                                        <p>@($"Previous {history.Property}: {history.OldValue}")</p>
-                                        <p>@($"Current {history.Property}: {history.NewValue}")</p>
+										@if (history.Description.Contains("New Ticket Created"))
+										{
+											<p>A ticket was added.</p>
+										}
+										else if (history.Property.Equals("TicketComment") || history.Property.Equals("TicketAttachment"))
+										{
+											<p>A <strong>@history.Property</strong> was added.</p>
+										}
+										else
+										{
+											<p>The ticket <strong>@history.Property</strong> was edited</p>
+											<p>@($"Previous {history.Property}:")  <span style="color:red;">@history.OldValue</span></p>
+											<p>@($"Current {history.Property}:") <span style="color:green;">@history.NewValue</span></p>
+										}
 
                                     </div>
                                 </div>
+								<hr/>
                             }
 						</div>
 					</div>

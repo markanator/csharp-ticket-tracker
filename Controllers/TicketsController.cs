@@ -130,10 +130,25 @@ namespace TheBugTracker.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> AssignDeveloper(AssignDeveloperViewModel model)
         {
-            if (model.DeveloperId != null)
+            try
             {
-                await _ticketService.AssignTicketAsync(model.Ticket.Id, model.DeveloperId);
-                RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
+                if (model.DeveloperId != null)
+                {
+                    var user = await _userManagerService.GetUserAsync(User);
+                    var oldTicket = await _ticketService.GetTicketAsNoTrackingAsync(model.Ticket.Id);
+
+                    await _ticketService.AssignTicketAsync(model.Ticket.Id, model.DeveloperId);
+
+                    var newTicket = await _ticketService.GetTicketAsNoTrackingAsync(model.Ticket.Id);
+                    await _historyService.AddHistoryAsync(oldTicket, newTicket, user.Id);
+
+                    RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
 
             return RedirectToAction(nameof(AssignDeveloper), new { id = model.Ticket.Id });
@@ -188,15 +203,26 @@ namespace TheBugTracker.Controllers
             if (ModelState.IsValid)
             {
 
-                ticket.Created = DateTimeOffset.Now;
-                ticket.OwnerUserId = user.Id; // this is how EFCore saves relationships
-                ticket.TicketStatusId = (await _ticketService.LookupTicketStatusIdAsync(nameof(Models.Enums.TicketStatus.New))).Value;
+                try
+                {
+                    ticket.Created = DateTimeOffset.Now;
+                    ticket.OwnerUserId = user.Id; // this is how EFCore saves relationships
+                    ticket.TicketStatusId = (await _ticketService.LookupTicketStatusIdAsync(nameof(Models.Enums.TicketStatus.New))).Value;
 
-                await _ticketService.AddNewTicketAsync(ticket);
+                    await _ticketService.AddNewTicketAsync(ticket);
 
-                //TODO: TICKET HISTORY
-                //TODO: NOTFICATIONs
-                return RedirectToAction(nameof(Index));
+                    //TODO: TICKET HISTORY
+                    Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(ticket.Id);
+                    await _historyService.AddHistoryAsync(null, newTicket, user.Id);
+
+                    //TODO: NOTFICATIONs
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
 
             if (User.IsInRole(nameof(Roles.Admin)))
@@ -255,6 +281,9 @@ namespace TheBugTracker.Controllers
                     ticket.Updated = DateTimeOffset.Now;
                     await _ticketService.UpdateTicketAsync(ticket);
 
+                    // snapshot after updates
+                    Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(ticket.Id);
+                    await _historyService.AddHistoryAsync(oldTicket, newTicket, user.Id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -268,9 +297,6 @@ namespace TheBugTracker.Controllers
                     }
                 }
 
-                // snapshot after updates
-                Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(ticket.Id);
-                await _historyService.AddHistoryAsync(oldTicket, newTicket, user.Id);
 
                 return RedirectToAction(nameof(AllTickets));
             }
