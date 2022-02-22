@@ -214,7 +214,7 @@ namespace TheBugTracker.Services
             {
                 // for comments and attachements
                 var ticket = await _context.Tickets.FindAsync(ticketId);
-                string description = model.ToLower().Replace("Ticket", "");
+                string description = model.ToLower().Replace("ticket", "");
 
                 TicketHistory history = new TicketHistory()
                 {
@@ -224,7 +224,7 @@ namespace TheBugTracker.Services
                     NewValue = "",
                     Created = DateTimeOffset.Now,
                     UserId = userId,
-                    Description = $"New {description} add to ticket: {ticket.Title}"
+                    Description = $"New {description} added to ticket: {ticket.Title}"
                 };
 
                 await _context.TicketHistories.AddAsync(history);
