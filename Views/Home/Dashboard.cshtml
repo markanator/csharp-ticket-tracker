@@ -11,6 +11,8 @@
 
 @{
 	ViewData["Title"] = "Dashboard";
+	
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
 
 	BTUser currentUser = await UserManager.GetUserAsync(User);
 }
