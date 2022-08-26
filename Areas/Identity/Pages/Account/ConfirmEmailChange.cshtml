@@ -2,7 +2,19 @@
 @model ConfirmEmailChangeModel
 @{
     ViewData["Title"] = "Confirm email change";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row g-1 p-0 p-md-4">
+    <div class="col-12 text-center mb-5">
+        <h1>@ViewData["Title"]</h1>
+    </div>
+
+    <div class="col-12 mb-4">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+    </div>
+
+    <div class="col-12 text-center mt-4">
+        <span class="text-muted"><a asp-page="./Login">Back to Sign in</a></span>
+    </div>
+</div>

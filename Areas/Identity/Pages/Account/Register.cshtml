@@ -1,47 +1,91 @@
 ﻿@page
 @model RegisterModel
+
 @{
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
 
-<div class="row">
-    <div class="col-md-6 mx-auto">
-        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h4>Create a new account.</h4>
-            <hr />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.FirstName"></label>
-                <input asp-for="Input.FirstName" class="form-control" />
-                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.LastName"></label>
-                <input asp-for="Input.LastName" class="form-control" />
-                <span asp-validation-for="Input.LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.ConfirmPassword"></label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
+<form class="row g-1 p-0 p-md-4" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <div class="col-12 text-center mb-4">
+        <h1>Create an account</h1>
+        <span>Free access to our dashboard.</span>
     </div>
-
-</div>
+    <div class="col-12 mb-2">
+        <div asp-validation-summary="All" class="text-danger"></div>
+    </div>
+    <div class="col-6">
+        <div class="mb-2">
+            <label class="form-label">Full name</label>
+            <input type="text"
+                   asp-for="Input.FirstName"
+                   class="form-control form-control-lg"
+                   placeholder="John" required />
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="mb-2">
+            <label class="form-label">&nbsp;</label>
+            <input type="text"
+                   asp-for="Input.LastName"
+                   class="form-control form-control-lg"
+                   placeholder="Parker" required />
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-2">
+            <label class="form-label">Email address</label>
+            <input type="email"
+                   asp-for="Input.Email"
+                   class="form-control form-control-lg"
+                   placeholder="name@example.com" required />
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-2">
+            <label class="form-label">Password</label>
+            <input type="password"
+                   asp-for="Input.Password"
+                   class="form-control form-control-lg"
+                   placeholder="8+ characters required" required />
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-2">
+            <label class="form-label">Confirm password</label>
+            <input type="password"
+                   asp-for="Input.ConfirmPassword"
+                   class="form-control form-control-lg"
+                   placeholder="8+ characters required" />
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="form-check">
+            <input class="form-check-input"
+                   asp-for="Input.AcceptTerms"
+                   type="checkbox"
+                   required
+                   />
+            <label class="form-check-label" for="flexCheckDefault">
+                I accept the
+                <a href="#" title="" class="text-primary">Terms and Conditions</a>
+            </label>
+        </div>
+    </div>
+    <div class="col-12 text-center mt-4">
+        <button type="submit"
+                class="btn btn-lg btn-block btn-dark lift text-uppercase">
+            SIGN UP
+        </button>
+    </div>
+    <div class="col-12 text-center mt-4">
+        <span class="text-muted">
+            Already have an account?
+            <a asp-page="./Login">Sign in here</a>
+        </span>
+    </div>
+</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

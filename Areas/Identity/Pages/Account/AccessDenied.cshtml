@@ -2,9 +2,22 @@
 @model AccessDeniedModel
 @{
     ViewData["Title"] = "Access denied";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="row g-1 p-0 p-md-4">
+    <div class="col-12 text-center mb-4">
+        <img src="https://alui.thememakker.com/html/assets/images/auth-404.svg"
+             class="w240 mb-4"
+             alt="" />
+        <h1 class="display-5 text-danger">Access Denied!</h1>
+        <span class="text-muted">
+            You do not have access to this resource.
+        </span>
+    </div>
+    <div class="col-12 text-center">
+        <a asp-controller="Home" asp-action="Dashboard"
+           title=""
+           class="btn btn-lg btn-block btn-dark lift text-uppercase">Back to Home</a>
+    </div>
+</div>

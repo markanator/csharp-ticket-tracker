@@ -1,7 +1,16 @@
 ﻿@page
 @model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "Email Confirmed";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="row g-1 p-0 p-md-4">
+    <div class="col-12 text-center mb-5">
+        <h1>@ViewData["Title"]</h1>
+    </div>
+
+    <div class="col-12 text-center mt-4">
+        <span class="text-muted"><a asp-page="./Login">Back to Sign in</a></span>
+    </div>
+</div>

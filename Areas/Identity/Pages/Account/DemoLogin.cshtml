@@ -1,0 +1,34 @@
+﻿@page
+@model DemoLoginModel
+
+@{
+    ViewData["Title"] = "Demo Log in";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="row g-1 p-0 p-md-4">
+    <div class="col-12 text-center mb-4">
+        <h1>Demo Sign in</h1>
+        <span>Free demo access to our dashboard.</span>
+    </div>
+    <div class="col-12 text-center mb-2">
+        <form method="post">
+            <div class="col-12 mb-2">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+            <div class="col-12 mb-3 form-group">
+                <button class="btn btn-lg btn-outline-secondary btn-block" type="submit" asp-route-user="admin">
+                    <i class="bi bi-person-badge xs me-2"></i>
+                    Sign in as Admin
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

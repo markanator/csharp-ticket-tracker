@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -69,6 +68,10 @@ namespace TheBugTracker.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "You must accept the terms and conditions.")]
+            [Display(Name = "Accept Terms")]
+            public bool AcceptTerms { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
