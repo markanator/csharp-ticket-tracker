@@ -1,13 +1,18 @@
-﻿@using TheBugTracker.Models.Enums
-@using TheBugTracker.ViewModels
-@using TheBugTracker.Models
-@using TheBugTracker.Services.Interfaces
+﻿@model DashboardViewModel
+@using System.Linq
+@using System.Linq.Expressions
 @using Microsoft.AspNetCore.Identity
-
+@using TheBugTracker.Extensions
+@using TheBugTracker.Models
+@using TheBugTracker.Models.Enums
+@using TheBugTracker.Services.Interfaces
+@using TheBugTracker.ViewModels
 
 @inject UserManager<BTUser> UserManager
 @inject IRoleService RolesService
-@model DashboardViewModel
+@inject ICompanyInfoService CompanyInfoService
+@inject INotificationService NotificationService
+
 
 @{
 	ViewData["Title"] = "Dashboard";
@@ -15,6 +20,18 @@
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 
 	BTUser currentUser = await UserManager.GetUserAsync(User);
+	Company company = await CompanyInfoService.GetCompanyInfoByIdAsync(currentUser.CompanyId);
+
+	int allUsers = (await UserManager.GetUsersInRoleAsync(nameof(Roles.Admin))).Count +
+							(await UserManager.GetUsersInRoleAsync(nameof(Roles.ProjectManager))).Count +
+							(await UserManager.GetUsersInRoleAsync(nameof(Roles.Developer))).Count +
+							(await UserManager.GetUsersInRoleAsync(nameof(Roles.Submitter))).Count;
+	int developersCount = (await UserManager.GetUsersInRoleAsync(nameof(Roles.Developer))).Count;
+	int submittersCount = (await UserManager.GetUsersInRoleAsync(nameof(Roles.Submitter))).Count;
+	int projectManagersCount = (await UserManager.GetUsersInRoleAsync(nameof(Roles.Submitter))).Count;
+
+	List<Notification> notificationsList = await NotificationService.GetReceivedNotificationsAsync(currentUser.Id);
+    int notificationCount = notificationsList.Count;
 }
 
 <!-- Styles -->
@@ -30,46 +47,31 @@
 	}
 </style>
 
-<h1>Dashboard</h1>
-<a href="javascript:void(0);">
-	@if (currentUser?.AvatarFileData != null)
-	{
-		<img 
-		class="media-object" 
-		src="data:image/*;base64,@(Convert.ToBase64String(currentUser?.AvatarFileData))" 
-		alt="@currentUser.FullName"
-		width="60"
-		height="60"
-	/>
-	}
-	else
-	{
-		<img 
-		class="rounded-circle"
-		src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
-		alt="@currentUser.FullName"
-		width="30"
-		height="30"
-	/>
-	}
-</a>
+<div class="body-header border-bottom d-flex py-3">
+    <div class="container-fluid">
+		<div class="row align-items-center">
+			<div class="col">
+				<small class="text-muted">@currentUser.Company.Name</small>
+				<h1 class="h4 mt-0">Dashboard</h1>
+			</div>
+			<div class="col-auto">
+				<button type="button" class="btn btn-dark lift">
+					New Ticket
+				</button>
+			</div>
+		</div>
+    </div>
+</div>
 
-<strong>@currentUser.FullName</strong>
-
-<span class="text-muted">
-	<strong>@Model.Company.Name</strong>
-</span>
-
-
-<div>
-	<div classxfont-weighteighteightgetainer-fluid">
-		<!-- Info Pills -->
-		<div class="row mt-2">
-			<div class="col-lg-3 col-md-6 col-sm-6">
+<div class="body d-flex py-lg-4 py-3">
+	<div class="container-fluid">
+		@* First Row : Info Pills *@
+		<div class="row clearfix mt-2">
+			<div class="col-lg-3 col-md-6 col-6">
 				<a asp-action="AllProjects" asp-controller="Projects" style="text-decoration:none">
 					<div class="card text-center bg-info">
-						<div class="body">
-							<div class="p-15 text-light">
+						<div class="card-body">
+							<div class="p-3 text-light">
 								<h3>@Model.Projects.Where(p => p.StartDate < DateTime.Now && p.EndDate > DateTime.Now).Count()</h3>
 								<span>Active Projects</span>
 							</div>
@@ -77,11 +79,11 @@
 					</div>
 				</a>
 			</div>
-			<div class="col-lg-3 col-md-6 col-sm-6">
+			<div class="col-lg-3 col-md-6 col-6">
 				<a asp-action="AllTickets" asp-controller="Tickets" style="text-decoration:none">
 					<div class="card text-center bg-secondary">
-						<div class="body">
-							<div class="p-15 text-light">
+						<div class="card-body">
+							<div class="p-3 text-light">
 
 								<h3>@Model.Tickets.Count()</h3>
 								<span>Total Tickets</span>
@@ -90,82 +92,240 @@
 					</div>
 				</a>
 			</div>
-			<div class="col-lg-3 col-md-6 col-sm-6">
+			<div class="col-lg-3 col-md-6 col-6">
 				<div class="card text-center bg-warning">
-					<div class="body">
-						<div class="p-15 text-light">
+					<div class="card-body">
+						<div class="p-3 text-light">
 							<h3>@Model.Tickets.Where(t => string.IsNullOrEmpty(t.DeveloperUserId)).Count()</h3>
 							<span>Unassigned Tickets</span>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-3 col-md-6 col-sm-6">
+			<div class="col-lg-3 col-md-6 col-6">
 				<div class="card text-center bg-dark">
-					<div class="body">
-						<div class="p-15 text-light">
+					<div class="card-body">
+						<div class="p-3 text-light">
 							<h3>
-								@(Model.Projects.Count() + Model.Tickets.Count() + Model.Members.Count())
+								@Model.Tickets.Where(t => !string.IsNullOrEmpty(t.DeveloperUserId)).Count()
 							</h3>
-							<span>Total Data</span>
+							<span>Assigned Tickets</span>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="row gy-2">
-			<div class="col-md-12 col">
-				<div class="row col-cols-4 mt-5 bg-secondary">
+		@*Second Row : Charts/Data Points*@
+		<div class="row clearfix mt-4">
 
-					<div class="card col m-1 p-2">
+			@*Card 1 Stats*@
+			<div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+				<div class="row clearfix">
+					<div class="col-lg-12 col-md-12">
+						<div class="card top_counter h-100 pt-2">
+							<div class="card-body pb-0">
+								<div class="float-start text-center me-3 bg-light rounded-1 fs-2" style="width: 50px; height: 50px;"><i class="bi bi-person"></i> </div>
+								<div class="content">
+									<div class="text">New Users</div>
+									<h5 class="number">0</h5>
+								</div>
+								<hr />
+							</div>
+							<div class="card-body mt-0 pt-0 pb-0">
+								<div class="float-start text-center me-3 bg-light rounded-1 fs-2" style="width: 50px; height: 50px;"><i class="bi bi-people"></i> </div>
+								<div class="content">
+									<div class="text">Total Users</div>
+									<h5 class="number">@allUsers</h5>
+								</div>
+								<hr />
+							</div>
+
+							<div class="card-body mt-0 pt-0 pb-0">
+								<div class="float-start text-center me-3 bg-light rounded-1 fs-2" style="width: 50px; height: 50px;"><i class="bi bi-ticket"></i> </div>
+								<div class="content">
+									<div class="text">Tickets in Development</div>
+									<h5 class="number">@Model.Tickets.Where(t => t.TicketStatus.Name == "Development").Count()</h5>
+								</div>
+								<hr />
+							</div>
+
+							<div class="card-body mt-0 pt-0">
+								<div class="float-start text-center me-3 bg-light rounded-1 fs-2" style="width: 50px; height: 50px;"><i class="bi bi-code"></i> </div>
+								<div class="content">
+									<div class="text">Total Developers</div>
+									<h5 class="number">@developersCount</h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			@*Card 2 Stats*@
+			<div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+				<div class="card">
+					<div class="p-4 position-relative shadow-none pb-0 mb-1">
+						<h2 class="fs-5">
+							Company Data<br/>
+							<small class="text-muted fs-6">@company.Name</small>
+						</h2>
+					</div>
+					<div class="card-body pt-0">
+						<div class="list-group list-group-flush pt-0 pb-1 mt-0">
+							<div class="list-group-item d-flex align-items-center justify-content-between p-3">
+								<span>
+								<i class="bi bi-people text-muted fs-5 me-3"></i> Members
+								</span>
+								<span class="badge text-bg-success">@allUsers</span>
+							</div>
+							<div class="list-group-item d-flex align-items-center justify-content-between p-3">
+								<span>
+								<i class="bi bi-folder text-muted fs-5 me-3"></i> Projects
+								</span>
+								<span class="badge text-bg-info">@Model.Projects.Count</span>
+							</div>
+							<div class="list-group-item d-flex align-items-center justify-content-between p-3">
+								<span>
+								<i class="bi bi-ticket text-muted fs-5 me-3"></i> Tickets
+								</span>
+								<span class="badge text-bg-warning">@Model.Tickets.Count</span>
+							</div>
+							<div class="list-group-item d-flex align-items-center justify-content-between p-3 pb-0">
+								<span>
+								<i class="bi bi-bell text-muted fs-5 me-3"></i> Notifications
+								</span>
+								<span class="badge text-bg-danger">@notificationCount</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			@*Card 3 Pie Chart*@
+			<div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+				<div class="card">
+					<div class="p-4 position-relative shadow-none pb-0 mb-1">
+						<h2 class="fs-5">
+							Project Priorities<br />
+							<small class="text-muted fs-6">Project Priorities</small>
+						</h2>
+					</div>
+
+					@{
+						decimal x = Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Urgent)).Count() / Model.Projects.Count * 100;
+
+						decimal urgentCount = Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Urgent)).Count();
+						decimal highCount = Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.High)).Count();
+						decimal mediumCount = Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Medium)).Count();
+						decimal lowCount = Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Low)).Count();
+
+						decimal projectCount = Model.Projects.Count;
+
+						decimal urgentPercent = (urgentCount / projectCount) * 100;
+						decimal highPercent = (highCount / projectCount) * 100;
+						decimal mediumPercent = (mediumCount / projectCount) * 100;
+						decimal lowPercent = (lowCount / projectCount) * 100;
+					}
+
+					<div class="card-body mt-0 pt-0">
+						<div class="sparkline-pie text-center">@Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Urgent)).Count(),@Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.High)).Count(),@Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Medium)).Count(), @Model.Projects.Where(p => p.ProjectPriority.Name == nameof(TheBugTracker.Models.Enums.ProjectPriority.Low)).Count()</div>
+						<div class="stats-report text-center mt-4">
+							<div class="pe-4 d-inline-block">
+								<h5 class="fs-6">@nameof(TheBugTracker.Models.Enums.ProjectPriority.Urgent)</h5>
+								<b class="col-black">@String.Format("{0:0.0}", urgentPercent)%</b>
+							</div>
+							<div class="pe-4 d-inline-block">
+								<h5 class="fs-6">@nameof(TheBugTracker.Models.Enums.ProjectPriority.High)</h5>
+								<b class="col-black">@String.Format("{0:0.0}", highPercent)%</b>
+							</div>
+							<div class="pe-4 d-inline-block">
+								<h5 class="fs-6">@nameof(TheBugTracker.Models.Enums.ProjectPriority.Medium)</h5>
+								<b class="col-black">@String.Format("{0:0.0}", mediumPercent)%</b>
+							</div>
+							<div class=" d-inline-block">
+								<h5 class="fs-6">@nameof(TheBugTracker.Models.Enums.ProjectPriority.Low)</h5>
+								<b class="col-black">@String.Format("{0:0.0}", lowPercent)%</b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			@*Card 4 Stacked Chart*@
+			<div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+				<div class="card ">
+					<div class="header mb-1 pb-0">
+						<h2>Roles by Project</h2>
+					</div>
+					<div class="card-body mt-0 pt-0">
+						<div id="role-comp-chart" class="ct-chart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row clearfix mt-4">
+			<div class="col-md-12 col">
+				<div class="row">
+					<div class="col-lg-3 col-md-6 col-6">
+
+					<div class="card p-2">
 						<div class="card-body">
 							<h5>Projects by Priority</h5>
 							<p>[Google Charts]</p>
 							<div id="chart3D"></div>
 						</div>
 					</div>
-
-					<div class="card col m-1 p-2">
+					</div>
+					<div class="col-lg-3 col-md-6 col-6">
+					<div class="card p-2">
 						<div class="card-body">
 							<h5>Project Tickets Count (%)</h5>
 							<p>[Google Charts]</p>
 							<div id="donut"></div>
 						</div>
 					</div>
+					</div>
 
-					<div class="card col m-1 p-2">
+					<div class="col-lg-3 col-md-6 col-6">
+						<div class="card p-2">
 
-						<div class="card-body">
-							<h5>Tickets by Priority</h5>
-							<p>[Morris Charts]</p>
-							<!-- Morris: Donut -->
-							<div class="col-md-12">
-								<div id="legend" class="donut-legend" style="font-size:x-small"></div>
+							<div class="card-body">
+								<h5>Tickets by Priority</h5>
+								<p>[Morris Charts]</p>
+								<!-- Morris: Donut -->
+								<div class="col-md-12">
+									<div id="legend" class="donut-legend" style="font-size:x-small"></div>
+								</div>
+								<div class="col-md-12">
+									<div class="chart chart-md" id="morrisTicketPriority"></div>
+								</div>
 							</div>
-							<div class="col-md-12">
-								<div class="chart chart-md" id="morrisTicketPriority"></div>
-							</div>
+
 						</div>
 
 					</div>
-					<div class="card col m-1 p-2">
-						<div class="card-body">
-							<h5>Tickets by Status</h5>
-							<p>[ChartJS]</p>
-							<!-- ChartJS: Pie/Doughnut -->
-							<div class="col-md-12">
-								<!--  Chart.js Canvas Tag -->
-								<canvas id="donutChart"></canvas>
+
+					<div class="col-lg-3 col-md-6 col-6">
+						<div class="card p-2">
+							<div class="card-body">
+								<h5>Tickets by Status</h5>
+								<p>[ChartJS]</p>
+								<!-- ChartJS: Pie/Doughnut -->
+								<div class="col-md-12">
+									<!--  Chart.js Canvas Tag -->
+									<canvas id="donutChart"></canvas>
+								</div>
 							</div>
 						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
-		<div class="row gy-2">
-			<div class="cols mt-5 bg-secondary">
-				<div class="card col m-1 p-2">
+		
+		<div class="row clearfix mt-4">
+			<div class="col">
+				<div class="card p-2">
 					<div class="card-body" style="height:600px">
 						<h5>Project: Tickets vs Developers</h5>
 						<p>[amCharts]</p>
@@ -174,174 +334,169 @@
 					</div>
 				</div>
 			</div>
-			
-			<div class="cols mt-5 bg-secondary">
-				<div class="card col m-1 p-2">
-					<div class="row gy-2">
-						<div class="cols mt-5 bg-secondary">
-							<div class="card col m-1 p-2">
-								<div class="card-body" style="height:600px;overflow-y:auto;">
-									<h5>Project: Tickets vs Developers</h5>
-									<p>[Plotly]</p>	
-									<!-- HTML -->
-									<div id="plotlyChart"></div>
-								</div>
-							</div>
+
+			<div class="col ">
+				<div class="">
+					<div class="card">
+						<div class="card-body" style="height:600px;overflow-y:auto;">
+							<h5>Project: Tickets vs Developers</h5>
+							<p>[Plotly]</p>
+							<!-- HTML -->
+							<div id="plotlyChart"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-		</div>
-	</div>
-	<hr />
-	<div class="mt-5 ">
-		<div class="row">
-
+			</div>
+		
+		<div class="row mt-4">
 			<div class="col">
-				<div class="bg-secondary">
-					<div class="card m-1 p-2">
-						<div class="card-header">
-							<h2>Projects</h2>
-						</div>
-						<div class="card-body">
-							<div class="table-responsive" style="overflow-y:auto;height:600px;">
-                                <table class="table table-hover">
-                                    <thead class="">
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>StartDate</th>
-                                            <th>EndDate</th>
-                                            <th>Priority</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        @foreach (var project in Model.Projects.OrderByDescending(t => t.StartDate))
-                                        {
-                                            <tr>
-                                                <td style="font-size:small;">
-                                                    <a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id" style="color:black">
-                                                        <strong>@project.Name</strong>
-                                                    </a> 
-                                                </td>
-                                                <td style="font-size:small;">@project.StartDate.ToString("MMM dd, yyyy")</td>
-												<td style="font-size:small;">@project.EndDate.ToString("MMM dd, yyyy")</td>
-                                                <td><span class="badge bg-dark">@project.ProjectPriority?.Name</span></td>
-                                                <td style="font-size:small;"><a class="btn btn-sm btn-outline-secondary" 
-                                                        asp-action="Details" 
-                                                        asp-controller="Projects" 
-                                                        asp-route-id="@project.Id"
-                                                    >
-                                                    <i class="fs-5 bi-justify"></i></a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-						</div>
-						<div class="card-footer">
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="col">
-				<div class="bg-secondary">
-					<div class="card m-1 p-2">
-						<div class="card-header">
-							<h2>Tickets</h2>
-						</div>
-						<div class="card-body">
-							<div class="table-responsive" style="overflow-y:auto;height:600px;">
-                                <table class="table table-hover">
-                                    <thead class="">
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Developer</th>
-                                            <th>Status</th>
-                                            <th>Priority</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        @foreach (var ticket in Model.Tickets.OrderByDescending(d => d.Created))
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <a asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id" style="color:black">
-                                                        <strong>@ticket.Title</strong>
-                                                    </a> 
-                                                </td>
-                                                <td>
-                                                    @if (ticket.DeveloperUserId != null)
-                                                    {
-                                                        @ticket.DeveloperUser?.FullName
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-warning text-dark">Unassigned</span>
-                                                    }
-                                                </td>
-												
-												@if (ticket.TicketStatus.Name == "New")
-												{
-													<td><span class="badge bg-success rounded-pill">@ticket.TicketStatus.Name </span></td>
-												}
-												else
-												{
-													<td><span class="badge bg-secondary rounded-pill">@ticket.TicketStatus.Name </span></td>
-												}
-
-                                                <td><span class="badge bg-dark">@ticket.TicketPriority?.Name</span></td>
-                                                <td>@ticket.Created.ToString("MM-dd-yyyy")</td>
-                                                <td>
-                                                    <a class="btn btn-sm btn-outline-secondary" 
-                                                        asp-action="Details" 
-                                                        asp-controller="Tickets" 
-                                                        asp-route-id="@ticket.Id"
-                                                    >
-                                                    <i class="fs-5 bi-justify"></i>
-                                                    </a>
-
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-						</div>
-						<div class="card-footer">
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-2 ">
-				<div class="bg-dark">
-					<div class="card m-1 p-2">
+				<div class="">
+					<div class="card">
 						<div class="card-header">
 							<h2>Members</h2>
-							<hr />
 						</div>
 						<div class="card-body" style="overflow-y:auto;height:600px;background-color:antiquewhite">
 							@* Looop over Company members. Display Name and Role *@
 							@foreach (BTUser member in Model.Members)
-						   {
+							{
 								<div>
 									<span class="fw-bold">@member.FullName</span>
 									<p>@((await RolesService.GetUserRolesAsync(member)).FirstOrDefault())</p>
 								</div>
 								<hr />
-						   }
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col">
+				<div class="">
+					<div class="card">
+						<div class="card-header">
+							<h2>Projects</h2>
+						</div>
+						<div class="card-body">
+							<div class="table-responsive" style="overflow-y:auto;height:600px;">
+								<table class="table table-hover">
+									<thead class="">
+										<tr>
+											<th>Name</th>
+											<th>StartDate</th>
+											<th>EndDate</th>
+											<th>Priority</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+
+										@foreach (var project in Model.Projects.OrderByDescending(t => t.StartDate))
+										{
+											<tr>
+												<td style="font-size:small;">
+													<a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id" style="color:black">
+														<strong>@project.Name</strong>
+													</a>
+												</td>
+												<td style="font-size:small;">@project.StartDate.ToString("MMM dd, yyyy")</td>
+												<td style="font-size:small;">@project.EndDate.ToString("MMM dd, yyyy")</td>
+												<td><span class="badge bg-dark">@project.ProjectPriority?.Name</span></td>
+												<td style="font-size:small;">
+													<a class="btn btn-sm btn-outline-secondary"
+													asp-action="Details"
+													asp-controller="Projects"
+													asp-route-id="@project.Id">
+														<i class="fs-5 bi-justify"></i>
+													</a>
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="card-footer">
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+			<div class="row mt-4">
+				<div class="col">
+					<div class="">
+						<div class="card m-1 p-2">
+							<div class="card-header">
+								<h2>Tickets</h2>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive" style="overflow-y:auto;height:600px;">
+									<table class="table table-hover">
+										<thead class="">
+											<tr>
+												<th>Title</th>
+												<th>Developer</th>
+												<th>Status</th>
+												<th>Priority</th>
+												<th>Date</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+
+											@foreach (var ticket in Model.Tickets.OrderByDescending(d => d.Created))
+											{
+												<tr>
+													<td>
+														<a asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id" style="color:black">
+															<strong>@ticket.Title</strong>
+														</a>
+													</td>
+													<td>
+														@if (ticket.DeveloperUserId != null)
+														{
+															@ticket.DeveloperUser?.FullName
+														}
+														else
+														{
+															<span class="badge bg-warning text-dark">Unassigned</span>
+														}
+													</td>
+
+													@if (ticket.TicketStatus.Name == "New")
+													{
+														<td><span class="badge bg-success rounded-pill">@ticket.TicketStatus.Name </span></td>
+													}
+													else
+													{
+														<td><span class="badge bg-secondary rounded-pill">@ticket.TicketStatus.Name </span></td>
+													}
+
+													<td><span class="badge bg-dark">@ticket.TicketPriority?.Name</span></td>
+													<td>@ticket.Created.ToString("MM-dd-yyyy")</td>
+													<td>
+														<a class="btn btn-sm btn-outline-secondary"
+														asp-action="Details"
+														asp-controller="Tickets"
+														asp-route-id="@ticket.Id">
+															<i class="fs-5 bi-justify"></i>
+														</a>
+
+													</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="card-footer">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
 	</div>
 </div>
 

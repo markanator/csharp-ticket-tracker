@@ -1,6 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using TheBugTracker.Models
 @using TheBugTracker.Models.Enums
+
 @inject SignInManager<BTUser> SignInManager
+@inject UserManager<BTUser> UserManager
+
+@{
+    BTUser btUser = await UserManager.GetUserAsync(User);
+}
 
 <!DOCTYPE html>
 
@@ -18,89 +25,54 @@
 </head>
 <body>
     <div id="layout-a" class="theme-blue">
-        @* WHITE SIDEBAR - AUTH*@
-        <div class="navigation navbar navbar-light justify-content-center px-3 px-lg-2 py-2 py-md-3 border-end">
-            <a href="index.html" class="mb-0 mb-lg-3 brand-icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     width="30"
-                     viewBox="0 0 64 80"
-                     fill="none">
-                    <path d="M58.8996 22.7L26.9996 2.2C23.4996 -0.0999999 18.9996 0 15.5996 2.5C12.1996 5 10.6996 9.2 11.7996 13.3L15.7996 26.8L3.49962 39.9C-3.30038 47.7 3.79962 54.5 3.89962 54.6L3.99962 54.7L36.3996 78.5C36.4996 78.6 36.5996 78.6 36.6996 78.7C37.8996 79.2 39.1996 79.4 40.3996 79.4C42.9996 79.4 45.4996 78.4 47.4996 76.4C50.2996 73.5 51.1996 69.4 49.6996 65.6L45.1996 51.8L58.9996 39.4C61.7996 37.5 63.3996 34.4 63.3996 31.1C63.4996 27.7 61.7996 24.5 58.8996 22.7ZM46.7996 66.7V66.8C48.0996 69.9 46.8996 72.7 45.2996 74.3C43.7996 75.9 41.0996 77.1 37.9996 76L5.89961 52.3C5.29961 51.7 1.09962 47.3 5.79962 42L16.8996 30.1L23.4996 52.1C24.3996 55.2 26.5996 57.7 29.5996 58.8C30.7996 59.2 31.9996 59.5 33.1996 59.5C35.0996 59.5 36.9996 58.9 38.6996 57.8C38.7996 57.8 38.7996 57.7 38.8996 57.7L42.7996 54.2L46.7996 66.7ZM57.2996 36.9C57.1996 36.9 57.1996 37 57.0996 37L44.0996 48.7L36.4996 25.5V25.4C35.1996 22.2 32.3996 20 28.9996 19.3C25.5996 18.7 22.1996 19.8 19.8996 22.3L18.2996 24L14.7996 12.3C13.8996 8.9 15.4996 6.2 17.3996 4.8C18.4996 4 19.8996 3.4 21.4996 3.4C22.6996 3.4 23.9996 3.7 25.2996 4.6L57.1996 25.1C59.1996 26.4 60.2996 28.6 60.2996 30.9C60.3996 33.4 59.2996 35.6 57.2996 36.9Z"
-                          fill="black" />
-                </svg>
-            </a>
-
-            <ul class="nav navbar-nav flex-row flex-sm-column flex-grow-1 justify-content-start py-2 py-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link p-2 p-lg-3 d-block d-xl-none menu-toggle me-2 me-lg-0"
-                       href="#">
-                        <i class="bi bi-bars"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link p-2 p-lg-3"
-                       href="#"
-                       title="Search"
-                       data-bs-toggle="modal"
-                       data-bs-target="#SearchModal">
-                        <i class="bi bi-search"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link p-2 p-lg-3"
-                       href="#"
-                       title="notifications"
-                       data-bs-toggle="modal"
-                       data-bs-target="#notificationsModal">
-                        <i class="bi bi-bell"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link p-2 p-lg-3"
-                       href="#"
-                       data-bs-toggle="modal"
-                       data-bs-target="#LayoutModal">
-                        <i class="bi bi-sliders"></i>
-                    </a>
-                </li>
-                <li class="nav-item d-none d-sm-block">
-                    <a class="nav-link p-2 p-lg-3" href="#">
-                        <i class="bi bi-chat-left"></i>
-                    </a>
-                </li>
-                <li class="nav-item d-none d-sm-block flex-grow-1">
-                    <a class="nav-link p-2 p-lg-3" href="#">
-                        <i class="bi bi-calendar3"></i>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link p-2 p-lg-3"
-                       href="#"
-                       title="Settings"
-                       data-bs-toggle="modal"
-                       data-bs-target="#SettingsModal">
-                        <i class="bi bi-gear"></i>
-                    </a>
-                </li>
-                <li class="nav-item d-none d-sm-block">
-                    <a class="nav-link p-2 p-lg-3"
-                       href="#"
-                       title="Menu collapse">
-                        <i class="bi bi-person"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
 
         @* Blue SIDEBAR - NAVIGATION*@
         <div class="sidebar px-3 py-2 py-md-3">
             <div class="d-flex flex-column h-100">
-                <div class="d-flex align-items-center mb-4 mt-2">
-                    <h4 class="sidebar-title mb-0 flex-grow-1">
+                <a asp-route="./Dashboard" class="d-flex justify-content-center align-items-center mb-4 mt-2" style="color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                            width="30"
+                            viewBox="0 0 64 80"
+                            fill="none">
+                        <path d="M58.8996 22.7L26.9996 2.2C23.4996 -0.0999999 18.9996 0 15.5996 2.5C12.1996 5 10.6996 9.2 11.7996 13.3L15.7996 26.8L3.49962 39.9C-3.30038 47.7 3.79962 54.5 3.89962 54.6L3.99962 54.7L36.3996 78.5C36.4996 78.6 36.5996 78.6 36.6996 78.7C37.8996 79.2 39.1996 79.4 40.3996 79.4C42.9996 79.4 45.4996 78.4 47.4996 76.4C50.2996 73.5 51.1996 69.4 49.6996 65.6L45.1996 51.8L58.9996 39.4C61.7996 37.5 63.3996 34.4 63.3996 31.1C63.4996 27.7 61.7996 24.5 58.8996 22.7ZM46.7996 66.7V66.8C48.0996 69.9 46.8996 72.7 45.2996 74.3C43.7996 75.9 41.0996 77.1 37.9996 76L5.89961 52.3C5.29961 51.7 1.09962 47.3 5.79962 42L16.8996 30.1L23.4996 52.1C24.3996 55.2 26.5996 57.7 29.5996 58.8C30.7996 59.2 31.9996 59.5 33.1996 59.5C35.0996 59.5 36.9996 58.9 38.6996 57.8C38.7996 57.8 38.7996 57.7 38.8996 57.7L42.7996 54.2L46.7996 66.7ZM57.2996 36.9C57.1996 36.9 57.1996 37 57.0996 37L44.0996 48.7L36.4996 25.5V25.4C35.1996 22.2 32.3996 20 28.9996 19.3C25.5996 18.7 22.1996 19.8 19.8996 22.3L18.2996 24L14.7996 12.3C13.8996 8.9 15.4996 6.2 17.3996 4.8C18.4996 4 19.8996 3.4 21.4996 3.4C22.6996 3.4 23.9996 3.7 25.2996 4.6L57.1996 25.1C59.1996 26.4 60.2996 28.6 60.2996 30.9C60.3996 33.4 59.2996 35.6 57.2996 36.9Z"
+                                fill="white" />
+                    </svg>
+                    <h4 class="sidebar-title mb-0 ms-3 flex-grow-1">
                         Bug Tracker
                     </h4>
-                </div>
+                </a>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div class="d-flex mb-3 justify-content-center align-items-center">
+                        @if (btUser?.AvatarFileData != null)
+			            {
+				            <img src="data:image/*;base64,@(Convert.ToBase64String(btUser?.AvatarFileData))" class="rounded-circle user-photo mb-3" alt="@btUser.FullName" width="50" height="50" />
+			            }
+			            else
+			            {
+				            <img src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" class="rounded-circle user-photo mb-3" alt="@btUser.FullName" width="50" height="50" />
+			            }
+                        <div class="dropdown d-flex flex-column justify-content-start text-light ms-2 mt-2">
+                            <span>Welcome,</span>
+                            <a href="#" role="button" class="text-light fw-bold dropdown-toggle user-name" data-bs-toggle="dropdown" aria-expanded="false">
+                                <strong>@btUser.FullName</strong>
+                            </a>
+                            <span class="badge bg-dark mt-2 text-left">Admin</span>
+                            <ul class="dropdown-menu dropdown-menu-right account" x-placement="bottom-end" style="position: absolute; transform: translate3d(97px, 42px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Account Settings</a></li>
+                                <li class="dropdown-divider my-2"></li>
+                                <li><a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit();">Sign out</a></li>
+                                <li>
+                                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"></form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                
+                
                 @*
                 <form class="mb-2 mt-1">
                     <div class="input-group">
@@ -116,45 +88,64 @@
                         <a class="m-link active" href="#"><i class="bi bi-house-door"></i><span class="ms-3">Dashboard</span></a>
                     </li>
                     <li>
-                        <a class="m-link" href="#"><i class="bi bi-calendar"></i> <span class="ms-3">Calendar</span></a>
+                        <a class="m-link" href="#"><i class="bi bi-building"></i><span class="ms-3">Company</span></a>
                     </li>
                     <li>
-                        <a class="m-link" href="#"><i class="bi bi-chat-left"></i> <span class="ms-3">Chat app</span></a>
+                        <a class="m-link" href="#"><i class="bi bi-bell"></i><span class="ms-3">Notifications</span></a>
                     </li>
+
                     <li class="collapsed">
                         <a class="m-link"
                            data-bs-toggle="collapse"
-                           data-bs-target="#menu-Pages"
+                           data-bs-target="#menu-projects"
                            href="#">
-                            <i class="bi bi-file-earmark"></i> <span class="ms-3">Pages</span>
+                            <i class="bi bi-kanban"> </i>  <span class="ms-3">Projects</span>
                             <span class="arrow bi bi-chevron-down ms-auto text-end"></span>
                         </a>
 
-                        <ul class="sub-menu collapse" id="menu-Pages">
-                            <li><a class="ms-link" href="#">Profile</a></li>
-                            <li><a class="ms-link" href="#">Profile v2</a></li>
+                        <ul class="sub-menu collapse" id="menu-projects">
+                            <li><a class="ms-link" href="#">All Projects</a></li>
+                            <li><a class="ms-link" href="#">My Projects</a></li>
+                            <li><a class="ms-link" href="#">Add Project</a></li>
+                            <li><a class="ms-link" href="#">Manage Projects</a></li>
+                            <li><a class="ms-link" href="#">Archived Projects</a></li>
                         </ul>
                     </li>
+
                     <li class="collapsed">
                         <a class="m-link"
                            data-bs-toggle="collapse"
-                           data-bs-target="#menu-Authentication"
+                           data-bs-target="#menu-Tickets"
                            href="#">
-                            <i class="bi bi-lock"></i> <span class="ms-3">Authentication</span>
+                            <i class="bi bi-stickies"></i> <span class="ms-3">Tickets</span>
                             <span class="arrow bi bi-chevron-down ms-auto text-end"></span>
                         </a>
 
-                        <ul class="sub-menu collapse" id="menu-Authentication">
-                            <li><a class="ms-link" href="#">Sign in</a></li>
-                            <li><a class="ms-link" href="#">Sign up</a></li>
+                        <ul class="sub-menu collapse" id="menu-Tickets">
+                            <li><a class="ms-link" href="#">All Tickets</a></li>
+                            <li><a class="ms-link" href="#">My Tickets</a></li>
+                            <li><a class="ms-link" href="#">Add Tickets</a></li>
+                            <li><a class="ms-link" href="#">Unassigned Tickets</a></li>
+                            <li><a class="ms-link" href="#">Archived Tickets</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="collapsed">
+                        <a class="m-link"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#menu-Admin"
+                           href="#">
+                            <i class="bi bi-shield-lock"></i><span class="ms-3">Admin</span>
+                            <span class="arrow bi bi-chevron-down ms-auto text-end"></span>
+                        </a>
+
+                        <ul class="sub-menu collapse" id="menu-Admin">
+                            <li><a class="ms-link" href="#">Company Invite</a></li>
+                            <li><a class="ms-link" href="#">Manage Roles</a></li>
+                            <li><a class="ms-link" href="#">Manage Projects</a></li>
                         </ul>
                     </li>
                 </ul>
-
-                <button type="button"
-                        class="btn btn-link sidebar-mini-btn text-light">
-                    <span><i class="bi bi-arrow-left"></i></span>
-                </button>
             </div>
         </div>
 
